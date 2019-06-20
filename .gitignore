@@ -1,0 +1,6 @@
+.tmp
+.env.local*
+var
+tmp
+scrap*
+vendor

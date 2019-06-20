@@ -1,0 +1,22 @@
+{
+    "require": {
+        "ext-json": "^1.5",
+        "consistence/consistence": "^1.1"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "DinoTech\\Phelix\\": "src/"
+        }
+    },
+
+    "require-dev": {
+        "codeception/codeception": "^3.0"
+    },
+
+    "autoload-dev": {
+        "psr-4": {
+            "DinoTech\\Phelix\\tests\\": "tests/"
+        }
+    }
+}
