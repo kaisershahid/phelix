@@ -1,9 +1,10 @@
 <?php
-namespace DinoTech\Phelix\StdLib;
+namespace DinoTech\StdLib\Collections;
 
 use Consistence\Type\Type;
+use DinoTech\StdLib\KeyValue;
 
-class IndexedList extends Collection {
+class GenericList extends Collection {
     private $iterPos = 0;
 
     public function current() {
@@ -54,12 +55,17 @@ class IndexedList extends Collection {
         return $this;
     }
 
-    public function addAll($arr) {
+    public function addAll(Collection $arr) : Collection {
         if (is_array($arr)) {
             $this->arr = array_merge($this->arr, array_values($arr));
         } elseif ($arr instanceof Collection) {
-            $arr->walk(function(KeyValue $kv) { $this->push($kv->value()); });
+            $arr->traverse(function(KeyValue $kv) { $this->push($kv->value()); });
         }
+    }
+
+    public function arrayAddAll(array $arr): Collection {
+        $this->arr = array_merge($this->arr, array_values($arr));
+        return $this;
     }
 
     public function map(callable $callback) : Collection {

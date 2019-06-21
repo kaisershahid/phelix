@@ -6,7 +6,8 @@
 
     "autoload": {
         "psr-4": {
-            "DinoTech\\Phelix\\": "src/"
+            "DinoTech\\Phelix\\": "src/",
+            "DinoTech\\StdLib\\": "srcStdLib/"
         }
     },
 

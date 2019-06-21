@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\StdLib;
+namespace DinoTech\StdLib;
 
 /**
  * Unifies passing/receiving key-value pairs in a consistent way.

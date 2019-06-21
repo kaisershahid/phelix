@@ -2,7 +2,7 @@
 namespace DinoTech\Phelix\tests\unit\StdLib;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\StdLib\NameConverter;
+use DinoTech\StdLib\NameConverter;
 
 class NameConverterTest extends Unit {
     public function testDashToCamel() {

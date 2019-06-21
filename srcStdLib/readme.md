@@ -1,6 +1,8 @@
 # Standard Library `StdLib`
 
+## Enums
 
+While Consistence has a nice `Enum` implementation, it doesn't quite live up to what an enum should be, and is very limited. See [enum.md](enum.md) for more details.
 
 ## Collections
 

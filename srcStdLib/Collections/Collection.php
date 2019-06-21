@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\StdLib;
+namespace DinoTech\StdLib\Collections;
 
 /**
  * Base class for collection of values. Standardizes interface and expectations
@@ -13,6 +13,7 @@ namespace DinoTech\Phelix\StdLib;
  * @todo add sort to interface
  * @todo add diff/union operations to interface
  * @todo move static functions to CollectionUtils?
+ * @todo make a CollectionInterface
  */
 abstract class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonSerializable {
     protected $arr = [];
@@ -54,7 +55,7 @@ abstract class Collection implements \ArrayAccess, \Iterator, \Countable, \JsonS
      * @param callable $callback `function($value, $offset)`
      * @return Collection
      */
-    public function walk(callable $callback) : Collection {
+    public function traverse(callable $callback) : Collection {
         foreach ($this->arr as $i => $v) {
             $callback($v, $i);
         }

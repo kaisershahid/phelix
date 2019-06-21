@@ -1,7 +1,9 @@
 <?php
-namespace DinoTech\Phelix\StdLib;
+namespace DinoTech\StdLib\Collections;
 
-class Map extends Collection {
+use DinoTech\StdLib\KeyValue;
+
+class GenericMap extends Collection {
     private $keys;
     private $curKey;
     private $iterPos;
@@ -54,7 +56,7 @@ class Map extends Collection {
             }
         }
 
-        return new Map($arr);
+        return new GenericMap($arr);
     }
 
     /**
@@ -69,7 +71,7 @@ class Map extends Collection {
             }
         }
 
-        return new Map($arr);
+        return new GenericMap($arr);
     }
 
     /**
@@ -86,11 +88,7 @@ class Map extends Collection {
         return $result;
     }
 
-    public function addAll($arr) {
-        if (is_array($arr)) {
-            $this->arr = array_merge($this->arr, $arr);
-        } elseif ($arr instanceof Collection) {
-            $arr->walk(function(KeyValue $kv) { $this[$kv->key()] = $kv->value(); });
-        }
+    public function addAll(Collection $arr) : Collection {
+        $arr->traverse(function(KeyValue $kv) { $this[$kv->key()] = $kv->value(); });
     }
 }
