@@ -1,30 +1,22 @@
 <?php
-namespace DinoTech\Phelix\tests\unit\StdLib\Collections;
+namespace DinoTech\Phelix\tests\stdlib\Collections;
 
 use Codeception\Test\Unit;
-use DinoTech\StdLib\Collections\GenericList;
+use DinoTech\StdLib\Collections\StandardList;
+use DinoTech\StdLib\Collections\StandardMap;
 use DinoTech\StdLib\KeyValue;
 
 /**
- * @todo need more tests here
- * @todo test for map
+ * Verifies general collection operations defined in traits.
  */
-class GenericListTest extends Unit {
+class CollectionTraitsTest extends Unit {
     const START = [1, 2];
 
-    /** @var GenericList */
+    /** @var StandardList */
     private $subject;
 
     public function _before() {
-        $this->subject = new GenericList(self::START);
-    }
-
-    public function testArrayAddAll() {
-        $this->subject->arrayAddAll(['a' => 3, 'b' => 4]);
-        $this->assertEquals(
-            [1, 2, 3, 4],
-            $this->subject->jsonSerialize()
-        );
+        $this->subject = new StandardList(self::START);
     }
 
     public function testSlice() {
@@ -59,5 +51,29 @@ class GenericListTest extends Unit {
             [1, 3],
             $this->subject->push(3)->filter(function(KeyValue $kv) { return $kv->value() % 2 == 1; })->jsonSerialize()
         );
+    }
+
+    public function testDiffStrict() {
+        $source = new StandardMap(['a' => 1, 'b' => 2]);
+        $target = ['a' => 1, 'b' => '2', 'c' => 4];
+        $diffs  = $source->diff($target)->jsonSerialize();
+
+        $this->assertEquals(2, count($diffs));
+        $this->assertEquals(
+            ['key' => 'b', 'sourceValue' => 2, 'targetValue' => '2'],
+            $diffs['b']->jsonSerialize()
+        );
+        $this->assertEquals(
+            ['key' => 'c', 'sourceValue' => null, 'targetValue' => 4],
+            $diffs['c']->jsonSerialize()
+        );
+    }
+
+    public function testUnionStrict() {
+        $source = new StandardMap(['a' => 1, 'b' => 2]);
+        $target = ['a' => 1, 'b' => '2', 'c' => 4];
+        $union = $source->union($target)->jsonSerialize();
+
+        $this->assertEquals(['a' => 1], $union);
     }
 }

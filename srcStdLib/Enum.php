@@ -2,8 +2,8 @@
 namespace DinoTech\StdLib;
 
 use DinoTech\StdLib\Collections\Collection;
-use DinoTech\StdLib\Collections\GenericList;
-use DinoTech\StdLib\Collections\GenericMap;
+use DinoTech\StdLib\Collections\StandardList;
+use DinoTech\StdLib\Collections\StandardMap;
 use DinoTech\StdLib\Exceptions\EnumException;
 
 /**
@@ -33,7 +33,7 @@ abstract class Enum {
     public static final function values() : Collection {
         self::checkAndLoadCache();
         // @todo make read-only map impl and cache list
-        return new GenericMap(self::$enumsCache[static::class]);
+        return new StandardMap(self::$enumsCache[static::class]);
     }
 
     private static final function checkAndLoadCache() {

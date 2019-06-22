@@ -1,7 +1,7 @@
 <?php
 namespace DinoTech\StdLib;
 
-use DinoTech\StdLib\Collections\GenericList;
+use DinoTech\StdLib\Collections\StandardList;
 
 /**
  * Library to map to/from different naming conventions.
@@ -9,7 +9,7 @@ use DinoTech\StdLib\Collections\GenericList;
 class NameConverter {
     public static function separatorToCamel($name, $separator) {
         $c = 0;
-        return (new GenericList(explode($separator, $name)))
+        return (new StandardList(explode($separator, $name)))
             ->map(function(KeyValue $kv) use (&$c) { return $c++ == 0 ? $kv->value() : ucfirst($kv->value()); })
             ->join('');
     }
@@ -26,7 +26,7 @@ class NameConverter {
 
     public static function camelToLowerCasedSeparated($name, $separator) {
         $tokens = preg_split(self::REGEX_CAMEL_CASE_SPLIT, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-        return (new GenericList($tokens))
+        return (new StandardList($tokens))
             ->filter(function(KeyValue $kv) { return !empty($kv->value()); })
             ->map('strtolower')
             ->join($separator);

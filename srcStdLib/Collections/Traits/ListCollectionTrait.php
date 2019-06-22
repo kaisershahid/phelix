@@ -1,43 +1,19 @@
 <?php
-namespace DinoTech\StdLib\Collections;
+namespace DinoTech\StdLib\Collections\Traits;
 
-use Consistence\Type\Type;
+use DinoTech\StdLib\Collections\Collection;
+use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\KeyValue;
 
-class GenericList extends Collection {
-    private $iterPos = 0;
-
-    public function current() {
-        return $this[$this->iterPos];
-    }
-
-    public function next() {
-        $this->iterPos++;
-    }
-
-    public function key() {
-        return $this->iterPos;
-    }
-
-    public function valid() {
-        return $this->iterPos < count($this->arr);
-    }
-
-    public function rewind() {
-        $this->iterPos = 0;
-    }
-
-    public function offsetGet($offset) {
-        Type::checkType($offset, 'int');
-        return $this->arr[$offset];
-    }
-
-    public function offsetSet($offset, $value) {
-        Type::checkType($offset, 'int');
-        $this->arr[$offset] = $value;
-    }
-
-    public function push($value) {
+/**
+ * @property $arr array
+ */
+trait ListCollectionTrait {
+    /**
+     * @param mixed $val
+     * @return static|ListCollection
+     */
+    public function push($value) : ListCollection {
         $this->arr[] = $value;
         return $this;
     }
@@ -50,24 +26,42 @@ class GenericList extends Collection {
         return array_shift($this->arr);
     }
 
-    public function unshift($val) {
+    /**
+     * @param mixed $val
+     * @return static|ListCollection
+     */
+    public function unshift($val) : ListCollection {
         array_unshift($this->arr, $val);
         return $this;
     }
 
+    /**
+     * @param Collection $arr
+     * @return static|Collection
+     */
     public function addAll(Collection $arr) : Collection {
         if (is_array($arr)) {
             $this->arr = array_merge($this->arr, array_values($arr));
         } elseif ($arr instanceof Collection) {
             $arr->traverse(function(KeyValue $kv) { $this->push($kv->value()); });
         }
+
+        return $this;
     }
 
+    /**
+     * @param array $arr
+     * @return static|Collection
+     */
     public function arrayAddAll(array $arr): Collection {
         $this->arr = array_merge($this->arr, array_values($arr));
         return $this;
     }
 
+    /**
+     * @param callable $callback
+     * @return static|Collection
+     */
     public function map(callable $callback) : Collection {
         $arr = [];
         foreach ($this->arr as $key => $ele) {
@@ -77,6 +71,10 @@ class GenericList extends Collection {
         return new static($arr);
     }
 
+    /**
+     * @param callable $callback
+     * @return static|Collection
+     */
     public function filter(callable $callback) : Collection {
         $arr = [];
         foreach ($this->arr as $key => $ele) {
@@ -86,14 +84,5 @@ class GenericList extends Collection {
         }
 
         return new static($arr);
-    }
-
-    public function reduce(callable $callback, $carry = null) {
-        $result = $carry;
-        foreach ($this->arr as $ele) {
-            $result = $callback($ele, $carry);
-        }
-
-        return $result;
     }
 }
