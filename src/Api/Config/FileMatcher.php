@@ -1,0 +1,65 @@
+<?php
+namespace DinoTech\Phelix\Api\Config;
+
+use DinoTech\StdLib\Filesys\Path;
+use DinoTech\StdLib\Filesys\PathInfo;
+use DinoTech\StdLib\KeyValue;
+
+/**
+ * Given a filename `a.ext`, finds all files matching `a.*.ext`. The term _suffix_
+ * applies to the portion matched in `*`.
+ */
+class FileMatcher {
+    private $root;
+    private $base;
+    private $info = [];
+
+    public function __construct(string $baseFile, string $root = null) {
+        $this->root = $root ?: getcwd();
+        $this->base = $baseFile;
+        $this->info = PathInfo::make(Path::joinAndNormalize($this->root, $this->base));
+    }
+
+    /**
+     * Finds matching files and returns the suffixes.
+     *
+     * ```
+     * abcdef.******.extension
+     * [start suffix [end    ]
+     * ```
+     * @return array
+     */
+    public function getMatchingSuffixes() : array {
+        $base = $this->info->dirname() . '/' . $this->info->filename() . '.';
+        $ext = $this->info->extension();
+        $remStart = strlen($base);
+        $remEnd = 0 - strlen($ext) - 1;
+        if ($remEnd < 0) {
+            $remEnd = 0;
+        }
+
+        $pattern = $this->info->dirname() . '/' . $this->getNamePattern();
+        return
+            array_map(function(KeyValue $kv) use ($remStart, $remEnd) {
+                return substr($kv->value(), $remStart, $remEnd);
+            }, glob($pattern));
+    }
+
+    public function getNamePattern() {
+        $pattern = $this->info->filename() . '.*';
+        if ($this->info->extension()) {
+            $pattern .= '.' . $this->info->extension();
+        }
+
+        return $pattern;
+    }
+
+    /**
+     * Returns `dirname + '/' + filename + '.' + suffix + '.' . extension`
+     * @param string $suffix excludes leading '.'
+     * @return string
+     */
+    public function getFullPathBySuffix(string $suffix) : string {
+        return $this->info->fullPathWithSuffix('.' . $suffix);
+    }
+}

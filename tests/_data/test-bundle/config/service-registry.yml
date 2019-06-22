@@ -1,15 +1,14 @@
 # what a manual or generated service definition would look like
 services:
   - service:
-      interface: dino_tech.test_bundle.active_service
+      interface: DinoTech\TestBundle\
       rank: 5
     component:
       immediate: true
       enabled: true
       label: "dinotech test active service"
-      description: "nada
+      description: nada
     properties:
       key: value
       another.key: another value
     references:
-

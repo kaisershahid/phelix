@@ -1,0 +1,33 @@
+# globally accessible framework properties. can be referenced in configs through
+# ${properties:key}
+properties:
+  # a set of yaml configs to load into properties. these are processed after
+  # initial keys are loaded and can replace anything here.
+  # missing configs will issue a warning
+  #include:
+  #  - !config relative/path/to/config
+
+# configurations used by framework helpers. can be referenced in configs through
+# ${framework:key}
+framework:
+  # the following path.* properties contain the default values
+  path.tmp: ./var/tmp
+  path.log: ./var/logs
+  path.cache: ./var/cache
+
+# set of directories to process all bundles from. this bundles should be stored
+# same as 'bundleRoots' (i.e. `./groupId/bundleId`). as the name implies, these
+# bundles should be considered necessary for booting your app
+bundleBoot:
+  - ./bundles
+
+# set of directories to load bundles from. affects where the bundles referenced
+# in 'bundles' are looked up
+bundleRoots:
+  - ./vendor
+
+# set of bundles to load into framework. syntax is either `groupId/bundleId` or
+# `groupId/bundleId@version@version`. if `@version is specified, expects the bundle
+# directory to be `bundleId-version`
+bundles:
+#  - dinotech/phelix-core-extended@1.0.0
