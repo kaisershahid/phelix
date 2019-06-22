@@ -91,4 +91,19 @@ class GenericMap extends Collection {
     public function addAll(Collection $arr) : Collection {
         $arr->traverse(function(KeyValue $kv) { $this[$kv->key()] = $kv->value(); });
     }
+
+    /**
+     * Removes keys from current map and places them into new map.
+     * @param string ...$keys
+     * @return GenericMap
+     */
+    public function pluckKeys(string ...$keys) : GenericMap {
+        $arr = [];
+        foreach ($keys as $key) {
+            $arr[$key] = self::get($this->arr, $key);
+            unset($this->arr[$key]);
+        }
+
+        return new static($arr);
+    }
 }
