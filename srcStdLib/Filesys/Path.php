@@ -7,13 +7,23 @@ namespace DinoTech\StdLib\Filesys;
  */
 class Path {
     /**
+     * Turns backslashes to forward slashes.
+     * @param string $str
+     * @return string
+     */
+    public static function fixSlashes(string $str) : string {
+        return str_replace('\\', '/', $str);
+    }
+    /**
      * Joins multiple path parts together, ensuring no duplicated '/' separators.
+     * Any backslash is converted to forward slash.
      * @param string ...$pathParts
      * @return string
      */
-    public static function joinAndNormalize(string ...$pathParts) : string {
-        $buff = [self::chompRightSlash(array_shift($pathParts))];
-        foreach ($pathParts as $part) {
+    public static function join(string ...$pathParts) : string {
+        $parts = array_map([self::class, 'fixSlashes'], $pathParts);
+        $buff = [self::chompRightSlash(array_shift($parts))];
+        foreach ($parts as $part) {
             $buff[] = self::chompLeftSlash($part);
         }
 

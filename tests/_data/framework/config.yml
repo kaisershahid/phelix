@@ -2,3 +2,7 @@ properties:
   config-scope: test
   includes:
     - !config config/properties.yml
+
+bundles:
+  - provider/unversioned
+  - provider/versioned-0.0.1

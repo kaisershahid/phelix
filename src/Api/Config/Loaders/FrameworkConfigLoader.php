@@ -54,7 +54,7 @@ class FrameworkConfigLoader extends ConfigLoader {
      * @return FrameworkConfig
      */
     public function loadAndMergeConfigs() : FrameworkConfig {
-        $path = Path::joinAndNormalize($this->root, $this->configFile);
+        $path = Path::join($this->root, $this->configFile);
         Framework::debug("frameworkCfgLoader: root file $path");
         $baseConfig = $this->mergeProcessor->process($this->loadYamlFromFile($path));
         $frameworkCfg = FrameworkConfig::makeWithDefaults($baseConfig);
@@ -95,7 +95,7 @@ class FrameworkConfigLoader extends ConfigLoader {
      * @return mixed
      */
     public function processConfigTag($confPath, string $tag, $flags) {
-        $path = Path::joinAndNormalize($this->root, $confPath);
+        $path = Path::join($this->root, $confPath);
         Framework::debug("frameworkCfgLoader: !config -> $path");
         return (new GenericConfig())->loadYamlFromFile($path);
     }

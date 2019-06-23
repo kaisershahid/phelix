@@ -6,6 +6,9 @@ use DinoTech\StdLib\Collections\Traits\CollectionTrait;
 use DinoTech\StdLib\Collections\Traits\CountableTrait;
 use DinoTech\StdLib\Collections\Traits\IteratorTrait;
 
+/**
+ * @todo add ability to set KeyValue class on standard collection types
+ */
 class StandardCollection implements Collection {
     use CollectionTrait;
     use ArrayAccessTrait;

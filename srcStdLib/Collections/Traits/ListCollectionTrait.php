@@ -40,12 +40,7 @@ trait ListCollectionTrait {
      * @return static|Collection
      */
     public function addAll(Collection $arr) : Collection {
-        if (is_array($arr)) {
-            $this->arr = array_merge($this->arr, array_values($arr));
-        } elseif ($arr instanceof Collection) {
-            $arr->traverse(function(KeyValue $kv) { $this->push($kv->value()); });
-        }
-
+        $this->arrayAddAll($arr->values());
         return $this;
     }
 

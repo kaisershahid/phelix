@@ -71,7 +71,7 @@ abstract class Enum {
      *
      * @param string $name
      * @param array $arguments
-     * @return Enum
+     * @return static
      * @throws EnumException
      */
     public static final function __callStatic(string $name, $arguments) : Enum {

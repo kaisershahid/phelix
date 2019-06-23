@@ -17,7 +17,7 @@ class FileMatcher {
     public function __construct(string $baseFile, string $root = null) {
         $this->root = $root ?: getcwd();
         $this->base = $baseFile;
-        $this->info = PathInfo::make(Path::joinAndNormalize($this->root, $this->base));
+        $this->info = PathInfo::make(Path::join($this->root, $this->base));
     }
 
     /**

@@ -34,8 +34,8 @@ trait CollectionTrait {
      * @return static|Collection
      */
     public function traverse(callable $callback) : Collection {
-        foreach ($this->arr as $i => $v) {
-            $callback($v, $i);
+        foreach ($this->arr as $idx => $ele) {
+            $callback(new KeyValue($idx, $ele));
         }
 
         return $this;
@@ -43,8 +43,8 @@ trait CollectionTrait {
 
     public function reduce(callable $callback, $carry = null) {
         $result = $carry;
-        foreach ($this->arr as $ele) {
-            $result = $callback($ele, $carry);
+        foreach ($this->arr as $idx => $ele) {
+            $result = $callback(new KeyValue($idx, $ele), $carry);
         }
 
         return $result;

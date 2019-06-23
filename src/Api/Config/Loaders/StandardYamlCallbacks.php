@@ -27,7 +27,7 @@ class StandardYamlCallbacks {
 
     public function loadRawFile($path, $tag, $flags) {
         // @todo define root
-        $fullPath = Path::joinAndNormalize($this->fileRoot, $path);
+        $fullPath = Path::join($this->fileRoot, $path);
         Path::checkPathUnderRoot($fullPath, $this->fileRoot);
         Path::checkFileExists($fullPath);
 

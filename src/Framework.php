@@ -2,6 +2,8 @@
 namespace DinoTech\Phelix;
 
 use DinoTech\Phelix\Api\Bundle\BundleRegistry;
+use DinoTech\Phelix\Api\Bundle\Loaders\DetectBootable;
+use DinoTech\Phelix\Api\Bundle\Loaders\DetectNamedLibs;
 use DinoTech\Phelix\Api\Config\FileMatcher;
 use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
 use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
@@ -41,6 +43,41 @@ class Framework {
         }
     }
 
+    private static $namespaces = [];
+    private static $autoloaderRegistered = false;
+
+    public static function registerNamespace($namespace, $root) {
+        if (!isset(self::$namespaces[$namespace])) {
+            self::$namespaces[$namespace] = $root;
+        }
+    }
+
+    public static function registerAutoloader() {
+        if (self::$autoloaderRegistered) {
+            return;
+        }
+
+        self::$autoloaderRegistered = true;
+        spl_autoload_register([self::class, 'autoloader']);
+    }
+
+    public static function autoloader($class) {
+        foreach (self::$namespaces as $namespace => $root) {
+            $ns = $namespace . '\\';
+            $pos = strpos($class, $ns);
+            if ($pos === 0) {
+                $file = substr($class, strlen($ns)) . '.php';
+                $path = Path::join($root, $file);
+                if (file_exists($path)) {
+                    require $path;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     /** @var Env */
     private $env;
     /** @var string */
@@ -56,12 +93,19 @@ class Framework {
     private $bundleRegistry;
     /** @var ServiceRegistry */
     private $serviceRegistry;
-    /** @var  */
+    /** @var TBD */
     private $eventListeners;
 
     public function __construct(string $env = self::DEFAULT_ENV) {
         $this->env = new Env($env);
         $this->root = getcwd();
+        $this->serviceRegistry = new ServiceRegistry();
+        $this->bundleRegistry = (new BundleRegistry())
+            ->setFramework($this)
+            ->setServiceRegistry($this->serviceRegistry);
+        register_shutdown_function(function() {
+            $this->shutdown();
+        });
     }
 
     /**
@@ -127,7 +171,8 @@ class Framework {
         // @todo make a FrameworkLoader pattern so that we can leverage startup from build/cache/whatever
         $this->loadConfig();
         $this->loadBundles();
-        $this->startBundles();
+        $this->bundleRegistry->startBundles();
+
         $this->booted = true;
         return $this;
     }
@@ -154,10 +199,13 @@ class Framework {
     }
 
     protected function loadBundles() {
-
+        $bootManifests = (new DetectBootable($this))->scan()->getManifests();
+        $libManifests = (new DetectNamedLibs($this))->scan()->getManifests();
+        $this->bundleRegistry->registerBundles($bootManifests->addAll($libManifests));
     }
 
-    protected function startBundles() {
-
+    protected function shutdown() {
+        echo "--- shutdown ---\n";
+        $this->bundleRegistry->stopBundles();
     }
 }

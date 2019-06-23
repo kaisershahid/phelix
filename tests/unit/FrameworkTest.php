@@ -37,7 +37,6 @@ class FrameworkTest extends Unit {
     ];
 
     public function testBoot() {
-        codecept_debug($this->framework->getConfiguration()->jsonSerialize());
         $this->assertArraySubset(self::EXPECTED_CONFIG,
             $this->framework->getConfiguration()->jsonSerialize());
     }

@@ -1,8 +1,7 @@
 groupId: company-name
 bundleId: my-bundle
-namespace: DinoTech\TestBundle
 version: 3.2.1-TAG
+namespace: DinoTech\TestBundle
 activator: Activator # under derived namespace
 requires:
   - 'group-id:bundle-id:version'
-tag: !squawk hello
