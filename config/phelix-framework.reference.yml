@@ -4,8 +4,9 @@ properties:
   # a set of yaml configs to load into properties. these are processed after
   # initial keys are loaded and can replace anything here.
   # missing configs will issue a warning
-  #include:
+  #includes:
   #  - !config relative/path/to/config
+  #include: !config relative/path/to/config
 
 # configurations used by framework helpers. can be referenced in configs through
 # ${framework:key}
@@ -18,7 +19,7 @@ framework:
 # set of directories to process all bundles from. this bundles should be stored
 # same as 'bundleRoots' (i.e. `./groupId/bundleId`). as the name implies, these
 # bundles should be considered necessary for booting your app
-bundleBoot:
+bundlesBoot:
   - ./bundles
 
 # set of directories to load bundles from. affects where the bundles referenced

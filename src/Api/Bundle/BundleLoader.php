@@ -1,7 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Bundle;
 
-use DinoTech\Phelix\Api\Config\GenericConfig;
+use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\Filesys\Path;

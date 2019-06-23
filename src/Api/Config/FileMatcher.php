@@ -34,14 +34,15 @@ class FileMatcher {
         $ext = $this->info->extension();
         $remStart = strlen($base);
         $remEnd = 0 - strlen($ext) - 1;
-        if ($remEnd < 0) {
+        // means no extension
+        if ($remEnd == -1) {
             $remEnd = 0;
         }
 
         $pattern = $this->info->dirname() . '/' . $this->getNamePattern();
         return
-            array_map(function(KeyValue $kv) use ($remStart, $remEnd) {
-                return substr($kv->value(), $remStart, $remEnd);
+            array_map(function(string $filePath) use ($remStart, $remEnd) {
+                return substr($filePath, $remStart, $remEnd);
             }, glob($pattern));
     }
 

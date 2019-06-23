@@ -3,7 +3,9 @@ namespace DinoTech\Phelix;
 
 use DinoTech\Phelix\Api\Bundle\BundleRegistry;
 use DinoTech\Phelix\Api\Config\FileMatcher;
-use DinoTech\Phelix\Api\Config\GenericConfig;
+use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
+use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
+use DinoTech\Phelix\Api\Config\Wrappers\FrameworkConfig;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\StdLib\Filesys\Path;
 
@@ -125,7 +127,7 @@ class Framework {
         }
 
         // @todo make a FrameworkLoader pattern so that we can leverage startup from build/cache/whatever
-        $this->chooseAndLoadConfig();
+        $this->loadConfig();
         $this->loadBundles();
         $this->startBundles();
         $this->booted = true;
@@ -135,31 +137,20 @@ class Framework {
         return $this->booted;
     }
 
-    protected function chooseAndLoadConfig() {
+    protected function loadConfig() {
         if ($this->configuration !== null) {
-            self::debug("framework: configuration set");
+            self::debug("framework: configuration explicitly set");
             return;
         }
 
         $this->root = $this->root ?: getcwd();
-        $path = Path::joinAndNormalize($this->root, $this->configFile);
+
         try {
-            self::debug("framework: configuration from file: $path");
-            $this->configuration = (new GenericConfig())->loadYamlFromFile($path);
-            $this->loadAndMergeConfigsByEnvironment();
+            $this->configuration = (new FrameworkConfigLoader($this->root, $this->configFile))
+                ->setEnvironment($this->env)
+                ->loadAndMergeConfigs();
         } catch (\RuntimeException $e) {
             throw new FrameworkException($e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    protected function loadAndMergeConfigsByEnvironment() {
-        // @todo move config logic to FrameworkConfig or something
-        $fm = new FileMatcher($this->configFile, $this->root);
-        $confSuffixes = $fm->getMatchingSuffixes();
-        foreach ($confSuffixes as $confSuffix) {
-            if ($this->env->is($confSuffix)) {
-                //$this->mergeConfig($fm->getFullPathBySuffix($confSuffix));
-            }
         }
     }
 

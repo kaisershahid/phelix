@@ -8,8 +8,8 @@ use DinoTech\StdLib\Filesys\Path;
  * Universal YAML tag handlers for the framework.
  */
 class StandardYamlCallbacks {
-    const CONSTANTS = '!const';
-    const RAW_FILE = '!raw_file';
+    const TAG_CONSTANTS = '!const';
+    const TAG_RAW_FILE  = '!raw_file';
 
     protected $fileRoot;
 
@@ -38,7 +38,7 @@ class StandardYamlCallbacks {
 
     public function getCallbacks() : array {
         return [
-            self::CONSTANTS => [$this, 'loadConstant'],
+            self::TAG_CONSTANTS => [$this, 'loadConstant'],
             //self::RAW_FILE => [$this, 'loadRawFile']
         ];
     }
