@@ -187,4 +187,74 @@ final class ArrayUtils {
 
         return $arr;
     }
+
+    /**
+     * A recursive merge with the following behaviors:
+     *
+     * 1. if both values are null, do nothing
+     * 2. otherwise, use `mergeNonNullValues`
+     *
+     * @param array $first
+     * @param array $second
+     * @return array
+     */
+    public static function merge(array $first, array $second) : array {
+        // need to capture keys from both, so do 2 passes of merging remove
+        // first keys from second to avoid any chance of duplication
+        $merged = self::_merge($first, $second);
+        foreach (array_keys($merged) as $key) {
+            unset($second[$key]);
+        }
+
+        // by removing same keys above, this copys remaining keys to first
+        return $merged + $second;
+    }
+
+    public static function _merge(array $first, array $second) : array {
+        $arr = [];
+        foreach ($first as $key => $val1) {
+            $val2 = self::get($second, $key);
+            if ($val1 === null && $val2 === null) {
+                continue;
+            }
+
+            $arr[$key] = self::mergeValues($val1, $val2);
+        }
+
+        return $arr;
+    }
+
+    /**
+     * 'Merges' 2 values based on the following rules:
+     *
+     * 1. if one is null, return the other
+     * 2. if first and second are arrays, do array merge
+     * 3. if first or second is array, append scalar to array
+     * 4. otherwise, use second
+     *
+     * @param mixed $first
+     * @param mixed $second
+     * @return mixed
+     */
+    public static function mergeValues($first, $second) {
+        if ($first === null) {
+            return $second;
+        } else if ($second === null) {
+            return $first;
+        }
+
+        $isV1arr = is_array($first);
+        $isV2arr = is_array($second);
+
+        if ($isV1arr && $isV2arr) {
+            return self::merge($first, $second);
+        } else if ($isV1arr) {
+            $first[] = $second;
+            return $first;
+        } else if ($isV2arr) {
+            $second[] = $first;
+        }
+
+         return $second;
+    }
 }

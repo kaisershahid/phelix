@@ -16,8 +16,8 @@ use DinoTech\StdLib\Filesys\Path;
 class Framework {
     private static $instance;
 
-    const DEFAULT_ENV = 'local';
-    const FILE_CONFIG = 'phelix-framework.yml';
+    const DEFAULT_ENV         = 'dev';
+    const DEFAULT_FILE_CONFIG = 'phelix-framework.yml';
 
     /**
      * Gets the singleton instance. If not yet created, uses the supplied environment
@@ -46,8 +46,8 @@ class Framework {
     /** @var string */
     private $root;
     /** @var string */
-    private $configFile;
-    /** @var array */
+    private $configFile = self::DEFAULT_FILE_CONFIG;
+    /** @var FrameworkConfig */
     private $configuration;
     /** @var bool */
     private $booted = false;
@@ -59,7 +59,7 @@ class Framework {
     /** @var  */
     private $eventListeners;
 
-    public function __construct(string $env = 'local') {
+    public function __construct(string $env = self::DEFAULT_ENV) {
         $this->env = new Env($env);
         $this->root = getcwd();
     }
@@ -75,7 +75,7 @@ class Framework {
      * @param mixed $root
      * @return Framework
      */
-    public function setRoot($root) {
+    public function setRoot($root) : Framework {
         $this->exceptionIfBooted("cannot set configFile after boot");
         $this->root = $root;
         return $this;
@@ -92,27 +92,25 @@ class Framework {
      * @param string $configFile
      * @return Framework
      */
-    public function setConfigFile(string $configFile) {
+    public function setConfigFile(string $configFile) : Framework {
         $this->exceptionIfBooted("cannot set configFile after boot");
         $this->configFile = $configFile;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfiguration() {
-        return $this->configuration;
-    }
 
     /**
      * @param array $configuration
      * @return Framework
      */
-    public function setConfiguration(array $configuration) {
-        $this->exceptionIfBooted("cannot set configFile after boot");
+    public function setConfiguration(FrameworkConfig $configuration) : Framework {
+        $this->exceptionIfBooted("cannot set configuration after boot");
         $this->configuration = $configuration;
         return $this;
+    }
+
+    public function getConfiguration() : FrameworkConfig {
+        return $this->configuration;
     }
 
     protected function exceptionIfBooted(string $message) {
@@ -121,9 +119,9 @@ class Framework {
         }
     }
 
-    public function boot() {
+    public function boot() : Framework {
         if ($this->booted) {
-            return;
+            return $this;
         }
 
         // @todo make a FrameworkLoader pattern so that we can leverage startup from build/cache/whatever
@@ -131,6 +129,7 @@ class Framework {
         $this->loadBundles();
         $this->startBundles();
         $this->booted = true;
+        return $this;
     }
 
     public function isBooted() {

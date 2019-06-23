@@ -58,7 +58,8 @@ class FrameworkConfig implements MapCollection {
     protected $bundles;
 
     public static function makeWithDefaults(array $config = []) {
-        $merged = array_merge_recursive($config, self::DEFAULTS);
+        $merged = ArrayUtils::merge(self::DEFAULTS, $config);
+
         return new self($merged);
     }
 
@@ -99,14 +100,7 @@ class FrameworkConfig implements MapCollection {
 
     public function mergeToNew(array $cfg) : FrameworkConfig {
         return new FrameworkConfig(
-            array_merge_recursive($this->arr, $cfg)
+            array_merge($this->arr, $cfg)
         );
-    }
-
-    public static function processIncludesKeys(array $config) {
-        $newConfig = [];
-        foreach ($config as $key => $val) {
-
-        }
     }
 }

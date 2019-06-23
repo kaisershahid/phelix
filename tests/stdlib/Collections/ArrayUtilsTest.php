@@ -45,4 +45,33 @@ class ArrayUtilsTest extends Unit {
         ArrayUtils::setNested($arr, $key, $expectedValue, ':');
         $this->assertEquals($expectedValue, ArrayUtils::getNested($arr, $key, ':'));
     }
+
+    const ARR1 = [
+        'str1' => 'str1',
+        'arr1_append_scalar' => [1, 2],
+        'arr2_append_scalar' => 9,
+        'arr3_merge' => ['a' => 1, 'b' => 2]
+    ];
+
+    const ARR2 = [
+        'str1' => 'str2-overwrite',
+        'arr1_append_scalar' => 3,
+        'arr2_append_scalar' => [7, 8],
+        'arr3_merge' => ['b' => 0.2, 3],
+        'str2' => 'str2'
+    ];
+
+    const ARR_MERGED = [
+        'str1' => 'str2-overwrite',
+        'arr1_append_scalar' => [1,2, 3],
+        'arr2_append_scalar' => [7, 8, 9],
+        'arr3_merge' => ['a' => 1, 'b' => 0.2, 0 => 3],
+        'str2' => 'str2'
+    ];
+
+    public function testMerge() {
+        $arr = ArrayUtils::merge(self::ARR1, self::ARR2);
+        $this->assertEquals(self::ARR_MERGED,
+            ArrayUtils::merge(self::ARR1, self::ARR2));
+    }
 }
