@@ -46,7 +46,7 @@ class Record {
     /**
      * @return BundleActivator
      */
-    public function getActivator(): BundleActivator {
+    public function getActivator(): ?BundleActivator {
         return $this->activator;
     }
 

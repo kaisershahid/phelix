@@ -4,10 +4,10 @@ namespace DinoTech\Phelix;
 use DinoTech\Phelix\Api\Bundle\BundleRegistry;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectBootable;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectNamedLibs;
-use DinoTech\Phelix\Api\Config\FileMatcher;
+use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
 use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
 use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
-use DinoTech\Phelix\Api\Config\Wrappers\FrameworkConfig;
+use DinoTech\Phelix\Api\Config\FrameworkConfig;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\StdLib\Filesys\Path;
 

@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Api\Config\Wrappers;
+namespace DinoTech\Phelix\Api\Config;
 
 use DinoTech\StdLib\Collections\ArrayUtils;
 use DinoTech\StdLib\Collections\Collection;

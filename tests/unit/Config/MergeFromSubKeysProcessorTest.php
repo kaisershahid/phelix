@@ -2,7 +2,7 @@
 namespace DinoTech\Phelix\tests\unit\Config;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\Api\Config\MergeFromSubKeysProcessor;
+use DinoTech\Phelix\Api\Config\Loaders\MergeFromSubKeysProcessor;
 
 class MergeFromSubKeysProcessorTest extends Unit {
     const ARR = [

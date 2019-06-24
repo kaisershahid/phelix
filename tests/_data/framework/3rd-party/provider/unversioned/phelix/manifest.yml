@@ -2,4 +2,3 @@ groupId: provider
 bundleId: unversioned
 version: 1.0.0
 namespace: DinoTech\TestBundle
-activator: Activator # under derived namespace

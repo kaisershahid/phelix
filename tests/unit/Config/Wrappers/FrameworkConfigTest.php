@@ -2,7 +2,7 @@
 namespace DinoTech\Phelix\tests\unit\Config\Wrappers;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\Api\Config\Wrappers\FrameworkConfig;
+use DinoTech\Phelix\Api\Config\FrameworkConfig;
 
 class FrameworkConfigTest extends Unit {
 

@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Api\Config;
+namespace DinoTech\Phelix\Api\Config\Loaders;
 
 /**
  * Signals issue with configuration file.

@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Api\Config;
+namespace DinoTech\Phelix\Api\Config\Loaders;
 
 use DinoTech\StdLib\Filesys\Path;
 use DinoTech\StdLib\Filesys\PathInfo;

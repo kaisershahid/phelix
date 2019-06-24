@@ -2,6 +2,8 @@
 namespace DinoTech\Phelix\Api\Bundle;
 
 use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
+use DinoTech\Phelix\Api\Config\ServiceConfig;
+use DinoTech\Phelix\Api\Config\ServiceRegistryConfig;
 use DinoTech\Phelix\Framework;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\StdLib\Filesys\Path;
@@ -25,17 +27,19 @@ class DefaultActivator implements BundleActivator {
     }
 
     public function activate(ServiceRegistry $serviceRegistry) {
-        $this->serviceConfig = $this->getServiceConfig();
-        $serviceRegistry->loadFromConfig($this->serviceConfig);
+        $this->serviceConfig = $this->getServiceRegistryConfig();
+        print_r($this->serviceConfig);
+        //$serviceRegistry->loadFromConfig($this->serviceConfig);
     }
 
-    public function getServiceConfig() : array {
+    public function getServiceRegistryConfig() : ServiceRegistryConfig {
         $path = Path::join($this->manifest->getBundleRoot(), BundleReader::FILE_SERVICE_REGISTRY);
+        $conf = [];
         if (file_exists($path)) {
-            return (new GenericConfig())->noCallbacks()->loadYamlFromFile($path);
+            $conf = (new GenericConfig())->noCallbacks()->loadYamlFromFile($path);
         }
 
-        return [];
+        return new ServiceRegistryConfig($conf);
     }
 
     public function deactivate(ServiceRegistry $serviceRegistry) {

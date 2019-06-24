@@ -95,7 +95,7 @@ class BundleRegistry {
         }
     }
 
-    protected function checkForSourceRootAndActivator(BundleManifest $manifest) : BundleActivator {
+    protected function checkForSourceRootAndActivator(BundleManifest $manifest) : ?BundleActivator {
         $bundleRoot = $manifest->getBundleRoot();
         $srcDir = $manifest->getSrcRoot();
 

@@ -99,7 +99,7 @@ class BundleManifest implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getActivator(): string {
+    public function getActivator(): ?string {
         return $this->activator;
     }
 

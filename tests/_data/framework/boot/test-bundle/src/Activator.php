@@ -3,20 +3,15 @@ namespace DinoTech\TestBundle;
 
 use DinoTech\Phelix\Api\Bundle\BundleActivator;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
+use DinoTech\Phelix\Api\Bundle\DefaultActivator;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
 
-class Activator implements BundleActivator {
-    public function setFramework(Framework $framework): BundleActivator {
-        return $this;
-    }
-
-    public function setManifest(BundleManifest $manifest): BundleActivator {
-        return $this;
-    }
-
+class Activator extends DefaultActivator {
     public function activate(ServiceRegistry $serviceRegistry) {
-        echo "(((((( ACTIVATING!\n";
+        echo self::class . " >> activate()\n";
+        $conf = $this->getServiceRegistryConfig();
+        print_r($conf);
     }
 
     public function deactivate(ServiceRegistry $serviceRegistry) {

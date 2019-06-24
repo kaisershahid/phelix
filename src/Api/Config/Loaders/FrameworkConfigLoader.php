@@ -1,10 +1,9 @@
 <?php
 namespace DinoTech\Phelix\Api\Config\Loaders;
 
-use DinoTech\Phelix\Api\Config\ConfigLoader;
-use DinoTech\Phelix\Api\Config\FileMatcher;
-use DinoTech\Phelix\Api\Config\MergeFromSubKeysProcessor;
-use DinoTech\Phelix\Api\Config\Wrappers\FrameworkConfig;
+use DinoTech\Phelix\Api\Config\Loaders\ConfigLoader;
+use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
+use DinoTech\Phelix\Api\Config\FrameworkConfig;
 use DinoTech\Phelix\Env;
 use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\Filesys\Path;

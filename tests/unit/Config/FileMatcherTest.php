@@ -2,7 +2,7 @@
 namespace DinoTech\Phelix\tests\unit\Config;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\Api\Config\FileMatcher;
+use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
 
 class FileMatcherTest extends Unit {
     const BASE = 'a.ext';
