@@ -1,34 +1,68 @@
 <?php
 namespace DinoTech\Phelix\Api\Service;
 
+use DinoTech\Phelix\Api\Bundle\BundleManifest;
+use DinoTech\Phelix\Api\Bundle\BundleReader;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
+use DinoTech\Phelix\Api\Config\ServiceReference;
 use DinoTech\Phelix\Api\Config\ServiceRegistryConfig;
+use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\Registry\Index;
+use DinoTech\StdLib\Collections\Collection;
 
 class ServiceRegistry {
+    /** @var Index */
     private $services;
+    /** @var DefaultManager */
+    private $manager;
 
     private $pendingServices;
 
-    public function __construct() {
-        $this->services = new Index();
+    public function __construct(Index $services = null, DefaultManager $manager = null) {
+        $this->services = $services ?: new Index();
+        $this->manager = $manager ?: new DefaultManager($this->services);
     }
 
+    /**
+     * @param string $interface
+     * @return object|null
+     */
     public function getByInterface(string $interface) {
-
+        return $this->services->get($interface);
     }
 
-    public function getByQuery(string $query) {
-
+    /**
+     * @param string $interface
+     * @return array
+     */
+    public function getManyByInterface(string $interface) : array {
+        return $this->services->getAll($interface);
     }
 
-    public function registerService(ServiceConfig $serviceConfig) {
-
+    /**
+     * @param ServiceReference $ref
+     * @return Collection
+     * @throws \DinoTech\StdLib\Collections\UnsupportedOperationException
+     */
+    public function getByReference(ServiceReference $ref) : Collection {
+        return $this->services->getComponentsByReference($ref);
     }
 
-    public function loadFromConfig(ServiceRegistryConfig $registryConfig) {
+    public function loadBundle(BundleManifest $manifest) {
+        $bundleReader = $manifest->getReader();
+        if ($bundleReader === null) {
+            // @todo mark as incomplete or something
+            return;
+        }
+
+        $svConfigRaw = $bundleReader->loadConfiguration(BundleReader::FILE_SERVICE_REGISTRY);
+        $svcConfig = new ServiceRegistryConfig($svConfigRaw ?: []);
+        $this->loadFromConfig($svcConfig, $manifest);
+    }
+
+    public function loadFromConfig(ServiceRegistryConfig $registryConfig, BundleManifest $manifest) {
         foreach ($registryConfig->getServiceConfigs() as $config) {
-            $this->registerService($config);
+            $this->manager->startService($config, $manifest);
         }
     }
 

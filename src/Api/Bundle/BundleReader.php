@@ -7,7 +7,7 @@ use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\Filesys\Path;
 
 /**
- * Wraps reading and loading bundle information
+ * Wraps reading and loading bundle information.
  */
 interface BundleReader {
     const FILE_SERVICE_REGISTRY = 'phelix/service-registry.yml';
@@ -15,7 +15,7 @@ interface BundleReader {
 
     public function setRoot(string $root) : BundleReader;
 
-    public function loadManifest() : BundleReader;
+    public function loadManifest() : ?BundleManifest;
 
-    public function getManifest() : BundleManifest;
+    public function loadConfiguration($fullPath) : ?array;
 }

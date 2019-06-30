@@ -60,7 +60,7 @@ trait ListCollectionTrait {
     public function map(callable $callback) : Collection {
         $arr = [];
         foreach ($this->arr as $key => $ele) {
-            $arr[] = $callback(new KeyValue($key, $ele));
+            $arr[] = $callback($this->getNewKeyValue($key, $ele));
         }
 
         return new static($arr);
@@ -73,7 +73,7 @@ trait ListCollectionTrait {
     public function filter(callable $callback) : Collection {
         $arr = [];
         foreach ($this->arr as $key => $ele) {
-            if ($callback(new KeyValue($key, $ele))) {
+            if ($callback($this->getNewKeyValue($key, $ele))) {
                 $arr[] = $ele;
             }
         }

@@ -3,7 +3,9 @@ namespace DinoTech\Phelix\Api\Config;
 
 use DinoTech\StdLib\Collections\ArrayUtils;
 use DinoTech\StdLib\Collections\Collection;
+use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\Collections\MapCollection;
+use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\Collections\Traits\ArrayAccessTrait;
 use DinoTech\StdLib\Collections\Traits\CollectionTrait;
 use DinoTech\StdLib\Collections\Traits\CountableTrait;
@@ -61,7 +63,7 @@ class ServiceConfig implements \JsonSerializable {
      * @return string
      */
     public function getInterface(): string {
-        return $this->interface;
+        return $this->interface ?: $this->class;
     }
 
     /**
@@ -86,10 +88,10 @@ class ServiceConfig implements \JsonSerializable {
     }
 
     /**
-     * @return ServiceReference[]
+     * @return ServiceReference[]|ListCollection
      */
-    public function getReferences(): array {
-        return $this->references;
+    public function getReferences(): ListCollection {
+        return new StandardList($this->references);
     }
 
     /**

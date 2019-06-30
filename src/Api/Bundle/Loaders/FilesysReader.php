@@ -20,23 +20,32 @@ class FilesysReader implements BundleReader {
         return $this;
     }
 
-    public function loadManifest() : BundleReader {
-        $path = Path::join($this->root, self::FILE_MANIFEST);
-        Framework::debug("loadManifest: $path");
-        if (file_exists($path)) {
-            $manifest = (new GenericConfig())->noCallbacks()
-                ->loadYamlFromFile($path);
-            $this->manifest = new BundleManifest($this->root, $manifest);
+    public function loadManifest() : ?BundleManifest {
+        Framework::debug("loadManifest: from {$this->root}");
+        $raw = $this->loadConfiguration(self::FILE_MANIFEST);
+        if ($raw !== null) {
+            $this->manifest = new BundleManifest($this->root, $raw, $this);
+            return $this->manifest;
         }
 
-        return $this;
+        return null;
     }
 
     /**
-     * @return mixed
+     * @return BundleManifest
      */
     public function getManifest() : BundleManifest {
         return $this->manifest;
+    }
+
+    public function loadConfiguration($path): ?array {
+        $fullPath = Path::join($this->root, $path);
+        if (file_exists($fullPath)) {
+            return (new GenericConfig())->noCallbacks()
+                ->loadYamlFromFile($fullPath);
+        }
+
+        return null;
     }
 
     public static function isDirBundle(string $path) : bool {

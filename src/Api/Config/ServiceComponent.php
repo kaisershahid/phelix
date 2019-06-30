@@ -61,28 +61,28 @@ class ServiceComponent implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getLabel(): string {
+    public function getLabel(): ?string {
         return $this->label;
     }
 
     /**
      * @return string
      */
-    public function getDescription(): string {
+    public function getDescription(): ?string {
         return $this->description;
     }
 
     /**
      * @return string
      */
-    public function getActivate(): string {
+    public function getActivate(): ?string {
         return $this->activate;
     }
 
     /**
      * @return string
      */
-    public function getDeactivate(): string {
+    public function getDeactivate(): ?string {
         return $this->deactivate;
     }
 

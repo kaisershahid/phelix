@@ -2,6 +2,7 @@
 namespace DinoTech\StdLib\Collections;
 
 use DinoTech\StdLib\Collections\Traits\MapCollectionTrait;
+use DinoTech\StdLib\KeyValue;
 
 /**
  * Unifies all basic and modern collection operations into a single interface
@@ -14,6 +15,16 @@ use DinoTech\StdLib\Collections\Traits\MapCollectionTrait;
  * @todo add sort to interface
  */
 interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializable {
+    /**
+     * Sets a subclass of `KeyValue` to use.
+     * @param string $class
+     * @return Collection
+     * @throws \InvalidArgumentException
+     */
+    public function setKeyValueClass($class) : Collection;
+
+    public function getNewKeyValue(string $key, $value) : KeyValue;
+
     /**
      * Returns all defined keys/indices.
      * @return array

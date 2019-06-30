@@ -13,6 +13,9 @@ class ServiceRegistryConfig {
         }, ArrayUtils::get($arr, 'services', []));
     }
 
+    /**
+     * @return ServiceConfig[]
+     */
     public function getServiceConfigs() : array {
         return $this->serviceConfigs;
     }

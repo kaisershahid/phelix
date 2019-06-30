@@ -1,0 +1,17 @@
+# what a manual or generated service definition would look like
+services:
+  -
+    interface: DinoTech\BundleB\DependentService
+    class: DinoTech\BundleB\DependentService
+    rank: 5
+    component:
+      abstract: false
+      immediate: true
+      enabled: true
+    metadata:
+      key: value
+      another.key: another value
+    references:
+      -
+        service: DinoTech\BundleA\MainService
+        cardinality: ONE

@@ -31,8 +31,7 @@ abstract class FilesysLoader {
         }
 
         $reader = (new FilesysReader())->setRoot($path);
-        $reader->loadManifest();
-        $manifest = $reader->getManifest();
+        $manifest = $reader->loadManifest();
         $this->manifests->push($manifest);
 
         Framework::debug("filesys loader: manifest found in $path");

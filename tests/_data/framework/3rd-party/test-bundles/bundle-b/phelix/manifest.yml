@@ -1,0 +1,7 @@
+groupId: test-bundles
+bundleId: bundle-b
+version: 0.0.0
+namespace: DinoTech\BundleB
+#activator: Activator
+requires:
+  - 'test-bundles:bundle-a@0.0.0'

@@ -10,7 +10,6 @@ use PHPUnit\Util\FileLoader;
 
 class DetectBootable extends FilesysLoader {
     public function scan() : FilesysLoader {
-        print_r($this->framework->getConfiguration()->jsonSerialize());
         $roots = $this->framework->getConfiguration()->getBundlesBoot();
         foreach ($roots as $dir) {
             $bootPath = Path::join($this->framework->getRoot(), $dir);

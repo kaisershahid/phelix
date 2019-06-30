@@ -132,4 +132,8 @@ abstract class Enum {
     public final function rankedLowerTHan(Enum $other) {
         return $this->compareRank($other) == -1;
     }
+
+    public function __toString() {
+        return $this->name();
+    }
 }

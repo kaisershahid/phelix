@@ -16,6 +16,8 @@ class BundleManifest implements \JsonSerializable {
     const DEFAULT_SRC_ROOT = 'src';
     const DEFAULT_RESOURCE_ROOT = 'resources';
 
+    /** @var BundleReader */
+    private $reader;
     /** @var string */
     private $bundleRoot;
     /** @var string */
@@ -35,7 +37,7 @@ class BundleManifest implements \JsonSerializable {
     /** @var array */
     private $requires;
 
-    public function __construct(string $root, array $config) {
+    public function __construct(string $root, array $config, BundleReader $reader = null) {
         $this->bundleRoot = $root;
         $this->groupId = Arr::get($config, self::KEY_GROUP_ID);
         $this->bundleId = Arr::get($config, self::KEY_BUNDLE_ID);
@@ -45,6 +47,7 @@ class BundleManifest implements \JsonSerializable {
         $this->resourceRoot = Arr::get($config, self::KEY_RESOURCE_ROOT, self::DEFAULT_RESOURCE_ROOT);
         $this->activator = Arr::get($config, self::KEY_ACTIVATOR);
         $this->requires = Arr::get($config, self::KEY_REQUIRES, []);
+        $this->reader = $reader;
     }
 
     /**
@@ -125,5 +128,9 @@ class BundleManifest implements \JsonSerializable {
             self::KEY_RESOURCE_ROOT => $this->resourceRoot,
             self::KEY_REQUIRES => $this->requires
         ];
+    }
+
+    public function getReader() : ?BundleReader {
+        return $this->reader;
     }
 }

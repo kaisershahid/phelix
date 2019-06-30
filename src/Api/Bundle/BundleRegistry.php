@@ -106,6 +106,7 @@ class BundleRegistry {
 
         $activatorName = $manifest->getActivator();
         if ($activatorName) {
+            // @todo check if class exists and mark bundle as error if not valid
             $class = $namespace . '\\' . $activatorName;
             return new $class();
         }

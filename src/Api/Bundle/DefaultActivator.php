@@ -27,6 +27,7 @@ class DefaultActivator implements BundleActivator {
     }
 
     public function activate(ServiceRegistry $serviceRegistry) {
+        $serviceRegistry->loadBundle($this->manifest);
         $this->serviceConfig = $this->getServiceRegistryConfig();
         print_r($this->serviceConfig);
         //$serviceRegistry->loadFromConfig($this->serviceConfig);

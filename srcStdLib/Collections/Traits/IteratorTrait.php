@@ -1,6 +1,7 @@
 <?php
 namespace DinoTech\StdLib\Collections\Traits;
 
+use DinoTech\StdLib\Collections\ArrayUtils;
 use DinoTech\StdLib\Collections\Collection;
 
 /**
@@ -16,11 +17,10 @@ trait IteratorTrait {
 
     public function current() {
         if ($this->iterKeys == null) {
-            $this->iterKeys   = array_keys($this->arr);
-            $this->iterCurKey = $this->iterKeys[0];
+            $this->rewind();
         }
 
-        return $this->arr[$this->iterCurKey];
+        return ArrayUtils::get($this->arr, $this->iterCurKey);
     }
 
     public function next() {
@@ -39,7 +39,7 @@ trait IteratorTrait {
     public function rewind() {
         $this->iterKeys   = array_keys($this->arr);
         $this->iterPos    = 0;
-        $this->iterCurKey = $this->iterKeys[$this->iterPos];
+        $this->iterCurKey = ArrayUtils::get($this->iterKeys, $this->iterPos);;
     }
 
     public function clearIterator() : Collection {

@@ -13,6 +13,22 @@ use DinoTech\StdLib\KeyValue;
  * @property $arr array
  */
 trait CollectionTrait {
+    private $preferredKeyValue = KeyValue::class;
+
+    public function setKeyValueClass($class) : Collection {
+        if (!is_subclass_of($class, KeyValue::class)) {
+            throw new \InvalidArgumentException("$class must be subclass of " . KeyValue::class);
+        }
+
+        $this->preferredKeyValue = $class;
+        return $this;
+    }
+
+    public function getNewKeyValue(string $key, $value) : KeyValue {
+        $cls = $this->preferredKeyValue;
+        return new $cls($key, $value);
+    }
+
     public function keys() : array {
         return array_keys($this->arr);
     }
@@ -35,7 +51,7 @@ trait CollectionTrait {
      */
     public function traverse(callable $callback) : Collection {
         foreach ($this->arr as $idx => $ele) {
-            $callback(new KeyValue($idx, $ele));
+            $callback($this->getNewKeyValue($idx, $ele));
         }
 
         return $this;
@@ -44,7 +60,7 @@ trait CollectionTrait {
     public function reduce(callable $callback, $carry = null) {
         $result = $carry;
         foreach ($this->arr as $idx => $ele) {
-            $result = $callback(new KeyValue($idx, $ele), $carry);
+            $result = $callback($this->getNewKeyValue($idx, $ele), $carry);
         }
 
         return $result;
@@ -75,7 +91,7 @@ trait CollectionTrait {
     public function map(callable $callback): Collection {
         $arr = [];
         foreach ($this->arr as $key => $val) {
-            $kv = new KeyValue($key, $val);
+            $kv = $this->getNewKeyValue($key, $val);
             $mapped = $callback($kv);
             if ($mapped instanceof KeyValue) {
                 $arr[$mapped->key()] = $mapped->value();
@@ -94,7 +110,7 @@ trait CollectionTrait {
     public function filter(callable $callback): Collection {
         $arr = [];
         foreach ($this->arr as $key => $val) {
-            if ($callback(new KeyValue($key, $val))) {
+            if ($callback($this->getNewKeyValue($key, $val))) {
                 $arr[$key] = $val;
             }
         }
