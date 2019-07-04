@@ -1,7 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Bundle;
 
-class Record {
+class BundleTracker {
     /** @var BundleManifest */
     private $manifest;
     /** @var BundleStatus */
@@ -20,9 +20,9 @@ class Record {
 
     /**
      * @param BundleManifest $manifest
-     * @return Record
+     * @return BundleTracker
      */
-    public function setManifest(BundleManifest $manifest): Record {
+    public function setManifest(BundleManifest $manifest): BundleTracker {
         $this->manifest = $manifest;
         return $this;
     }
@@ -36,9 +36,9 @@ class Record {
 
     /**
      * @param BundleStatus $status
-     * @return Record
+     * @return BundleTracker
      */
-    public function setStatus(BundleStatus $status): Record {
+    public function setStatus(BundleStatus $status): BundleTracker {
         $this->status = $status;
         return $this;
     }
@@ -52,9 +52,9 @@ class Record {
 
     /**
      * @param BundleActivator $activator
-     * @return Record
+     * @return BundleTracker
      */
-    public function setActivator(BundleActivator $activator): Record {
+    public function setActivator(BundleActivator $activator): BundleTracker {
         $this->activator = $activator;
         return $this;
     }
@@ -68,9 +68,9 @@ class Record {
 
     /**
      * @param \Exception $lifecycleException
-     * @return Record
+     * @return BundleTracker
      */
-    public function setLifecycleException(\Exception $lifecycleException): Record {
+    public function setLifecycleException(\Exception $lifecycleException): BundleTracker {
         $this->lifecycleException = $lifecycleException;
         return $this;
     }

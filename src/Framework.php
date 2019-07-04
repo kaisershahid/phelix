@@ -36,10 +36,12 @@ class Framework {
     }
 
     public static $debugEnabled = false;
+    public static $debugFunc = 'error_log';
 
     public static function debug(string $str, $extra = null) {
         if (self::$debugEnabled) {
-            error_log("[phelix] $str");
+            $func = self::$debugFunc;
+            $func("[phelix] $str");
         }
     }
 

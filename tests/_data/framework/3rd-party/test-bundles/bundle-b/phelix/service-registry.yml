@@ -6,7 +6,7 @@ services:
     rank: 5
     component:
       abstract: false
-      immediate: true
+      immediate: false
       enabled: true
       activate: doActivate
     metadata:

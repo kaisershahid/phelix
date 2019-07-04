@@ -16,7 +16,7 @@ use DinoTech\StdLib\KeyValue;
 class BundleRegistry {
     /** @var BundleManifest[]|MapCollection */
     private $manifests;
-    /** @var Record[]|MapCollection */
+    /** @var BundleTracker[]|MapCollection */
     private $records;
     /** @var Framework */
     private $framework;
@@ -56,7 +56,7 @@ class BundleRegistry {
         // @todo check dependencies -- if not all found, put in wait queue
         // @todo if group id/bundle id exist...?
         $id = $manifest->getId();
-        $record = (new Record())
+        $record = (new BundleTracker())
             ->setManifest($manifest)
             ->setStatus(BundleStatus::REGISTERED());
 

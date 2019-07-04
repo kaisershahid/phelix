@@ -3,7 +3,10 @@ namespace DinoTech\Phelix\Api\Service\Registry;
 
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\ServiceQuery;
+use DinoTech\Phelix\Framework;
+use DinoTech\StdLib\Collections\Collection;
 use DinoTech\StdLib\Collections\ListCollection;
+use DinoTech\StdLib\Collections\SetCollection;
 use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\Collections\StandardSet;
 use DinoTech\StdLib\KeyValue;
@@ -18,15 +21,15 @@ class ReferenceQueryTracker {
     private $query;
     /** @var string */
     private $queryHash;
-    /** @var ServiceTracker[]|ListCollection */
+    /** @var ServiceTracker[]|SetCollection */
     private $serviceTrackers;
-    /** @var ServiceTracker[]|ListCollection */
+    /** @var ServiceTracker[]|SetCollection */
     private $dependentServiceTrackers;
 
     public function __construct(ServiceQuery $query) {
         $this->query = $query;
         $this->queryHash = $query->getHash();
-        $this->serviceTrackers = (new StandardList())->setKeyValueClass(TrackerKeyValue::class);
+        $this->serviceTrackers = (new StandardSet())->setKeyValueClass(TrackerKeyValue::class);
         $this->dependentServiceTrackers = new StandardSet();
     }
 
@@ -40,8 +43,16 @@ class ReferenceQueryTracker {
     }
 
     public function addTracker(ServiceTracker $tracker) : ReferenceQueryTracker {
-        $this->serviceTrackers->push($tracker);
+        $this->serviceTrackers->add($tracker);
         return $this;
+    }
+
+    public function hasTracker(ServiceTracker $tracker) : bool {
+        return $this->serviceTrackers->findFirst($tracker) !== null;
+    }
+
+    public function getDependents() : Collection {
+        return $this->dependentServiceTrackers;
     }
 
     public function getServiceComponents() : ListCollection {
@@ -60,7 +71,8 @@ class ReferenceQueryTracker {
      * @return ReferenceQueryTracker
      */
     public function addDependent(ServiceTracker $tracker) : ReferenceQueryTracker {
-        $this->dependentServiceTrackers->push($tracker);
+        $this->dependentServiceTrackers->add($tracker);
+        Framework::debug("add dependent for ref({$this->queryHash}): {$tracker->getConfig()->getId()}, total deps={$this->dependentServiceTrackers->count()}");
         return $this;
     }
 
@@ -71,7 +83,11 @@ class ReferenceQueryTracker {
     public function hasOneSatisfied() : bool {
         return $this->serviceTrackers->reduce(function(TrackerKeyValue $kv, $carry) {
             $track = $kv->value();
-            return $carry || $track->getStatus()->greaterThan(LifecycleStatus::UNSATISFIED());
+            return $carry || $track->getStatus()->greaterThanOrEqual(LifecycleStatus::SATISFIED());
         }, false);
+    }
+
+    public function getHash() {
+        return $this->queryHash;
     }
 }

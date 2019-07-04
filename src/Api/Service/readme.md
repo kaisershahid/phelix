@@ -63,6 +63,18 @@ Properties are simple key-value pairs. They can drive configuration or expose ad
 
 Metadata describes the properties themselves. These can be used for things like auto-generating UI, validating configuration values, etc.
 
+## Component
+
+Components are plain PHP objects by default. The following is expected:
+
+1. components must have a null constructor
+2. dependency injection is done through reflection
+3. activation and deactivation methods must be explicitly defined if required and accept the following parameters: `DinoTech\Phelix\Api\ServiceProperties`
+
+### Factory
+
+tood
+
 ## Lifecycle
 
 ### Statuses
@@ -140,7 +152,7 @@ Once a service is deactivated, a dependent service immediately will go through a
 
 ## Service Registration
 
-The service registry of each bundle will be in `phelix/service-registry.yml` and structures as follows:
+The service registry of each bundle will be in `phelix/service-registry.yml` and structured as follows:
 
 ```yml
 services:
@@ -169,7 +181,7 @@ In Phelix, a `ServiceTracker` is used to monitor and retrieve services and compo
 
 - `ServiceConfig`
 - `BundleManifest`
-- `Scoreboard`
+- `Scoreboard` (tracks the number of reference cardinalities that haven't been satisfied)
 - component instance
 
-A `ServiceIndex` is used to hold all services and provide query access to them. 
+An `Index` is used to hold all services in the framework and provide query access to them. 

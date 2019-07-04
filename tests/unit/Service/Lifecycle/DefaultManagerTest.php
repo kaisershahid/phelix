@@ -8,6 +8,7 @@ use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
+use DinoTech\StdLib\Collections\ArrayUtils;
 
 class DefaultManagerTest extends Unit {
     /** @var DefaultManager */
@@ -24,6 +25,8 @@ class DefaultManagerTest extends Unit {
     protected $bundleManifestC;
 
     public function _before() {
+        Framework::$debugEnabled = true;
+        Framework::$debugFunc = 'codecept_debug';
         $root = codecept_data_dir() . '/framework/3rd-party/test-bundles';
         Framework::registerNamespace('DinoTech\\BundleA', "{$root}/bundle-a/src");
         Framework::registerNamespace('DinoTech\\BundleB', "{$root}/bundle-b/src");
@@ -42,6 +45,16 @@ class DefaultManagerTest extends Unit {
         $this->registry->loadBundle($this->bundleManifestA);
         $this->registry->loadBundle($this->bundleManifestB);
         $this->registry->loadBundle($this->bundleManifestC);
-        $this->subject->wakeUp();
+        //codecept_debug($this->services->jsonSerialize());
+
+        $expectBundleBSatisfied = [
+            'DinoTech\BundleB\DependentService' => [
+                [
+                    'status' => 'SATISFIED'
+                ]
+            ]
+        ];
+
+        $this->assertArraySubset($expectBundleBSatisfied, $this->services->jsonSerialize()['services']);
     }
 }

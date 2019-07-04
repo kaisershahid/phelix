@@ -3,14 +3,19 @@ namespace DinoTech\Phelix\Api\Service\Registry;
 
 use DinoTech\Phelix\Api\Service\ServiceQuery;
 use DinoTech\Phelix\Api\Config\ServiceReference;
+use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\Collections\ArrayUtils;
 use DinoTech\StdLib\Collections\Collection;
+use DinoTech\StdLib\Collections\SetCollection;
 use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\Collections\StandardSet;
 use DinoTech\StdLib\KeyValue;
 
+/**
+ * Contains the master list of all framework services.
+ */
 class Index implements \JsonSerializable {
-    /** @var StandardList[] of trackers */
+    /** @var TrackerList[] of trackers */
     private $services = [];
     /** @var ReferenceQueryTracker[] */
     private $references = [];
@@ -19,11 +24,11 @@ class Index implements \JsonSerializable {
         $config = $tracker->getConfig();
         $interface = $config->getInterface() ?: '';
         if (!isset($this->services[$interface])) {
-            $this->services[$interface] = (new StandardList())
-                ->setKeyValueClass(TrackerKeyValue::class);
+            $this->services[$interface] = new TrackerList();
         }
 
         $this->services[$interface]->push($tracker);
+        $this->checkAndAddToReferences($tracker);
         return $this;
     }
 
@@ -43,6 +48,12 @@ class Index implements \JsonSerializable {
         return $this->services[$interface]->values();
     }
 
+    public function checkAndAddToReferences(ServiceTracker $tracker) {
+        foreach ($this->references as $refTracker) {
+            $refTracker->addTrackerIfItMatchesQuery($tracker);
+        }
+    }
+
     /**
      * Adds a service reference to cache, and adds existing services that match
      * the query.
@@ -57,6 +68,7 @@ class Index implements \JsonSerializable {
             };
 
             foreach ($this->services as $list) {
+                Framework::debug("addReference ({$refTrack->getHash()}): back-adding");
                 $list->traverse($func);
             }
         }
@@ -91,6 +103,24 @@ class Index implements \JsonSerializable {
         return $refTrack;
     }
 
+    /**
+     * Returns all dependent services for a given service.
+     * @param ServiceTracker $tracker
+     * @param ServiceTracker[]|SetCollection
+     */
+    public function getDependentsForService(ServiceTracker $tracker) {
+        /** @var ServiceTracker[]|SetCollection $dependents */
+        $dependents = new StandardSet();
+        foreach ($this->references as $reference) {
+            if ($reference->hasTracker($tracker)) {
+                $dependents->addAll($reference->getDependents());
+            }
+        }
+
+
+        return $dependents;
+    }
+
     public function jsonSerialize() {
         $data = [];
         $data['services'] = [];
@@ -111,8 +141,8 @@ class Index implements \JsonSerializable {
         return $data;
     }
 
-    public function getAllTrackers() {
-        $trackers = new StandardList();
+    public function getAllTrackers() : TrackerList {
+        $trackers = new TrackerList();
         foreach ($this->services as $list) {
             $trackers->addAll($list);
         }
