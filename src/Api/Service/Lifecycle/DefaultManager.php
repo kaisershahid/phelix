@@ -57,16 +57,17 @@ class DefaultManager {
             $cardinality = $ref->getCardinality();
             $refQuery = $this->services->addReference($ref);
             Framework::debug("resolve ref({$refQuery->getHash()}) for {$tracker->getConfig()->getId()}");
+
             if ($cardinality->isMandatory()) {
                 if ($refQuery->hasOneSatisfied()) {
-                    // @todo remove reference
                     $tracker->getRefScoreboard()->decrease($cardinality);
+                    $tracker->markReference($ref);
                 } else {
                     $refQuery->addDependent($tracker);
                 }
             } else {
-                // @todo remove reference
                 $tracker->getRefScoreboard()->decrease($cardinality);
+                $tracker->markReference($ref);
             }
         }
 
@@ -74,7 +75,6 @@ class DefaultManager {
     }
 
     public function activateIfReferencesSatisfied(ServiceTracker $tracker) {
-        // @todo change to == 0 once we remove refs from multiple passes of resolveReferences()
         if ($tracker->getRefScoreboard()->getTotalScore() <= 0) {
             $tracker->setStatus(LifecycleStatus::SATISFIED());
             if ($tracker->getConfig()->getComponent()->isImmediate()) {

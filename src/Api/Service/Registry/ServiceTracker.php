@@ -8,6 +8,7 @@ use DinoTech\Phelix\Api\Service\Lifecycle\Introspector;
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\Collections\StandardList;
+use DinoTech\StdLib\KeyValue;
 use PharIo\Manifest\Manifest;
 
 class ServiceTracker implements \JsonSerializable {
@@ -21,6 +22,8 @@ class ServiceTracker implements \JsonSerializable {
     private $refScoreboard;
     /** @var ServiceReference[]ListCollection */
     private $refs;
+    /** @var array */
+    private $markedRefs = [];
     /** @var LifecycleStatus */
     private $status;
     /** @var Introspector */
@@ -72,10 +75,23 @@ class ServiceTracker implements \JsonSerializable {
     }
 
     /**
+     * Returns all unmarked references.
      * @return ServiceReference[]|ListCollection
      */
     public function getRefs(): ListCollection {
-        return $this->refs;
+        return $this->refs->filter(function(KeyValue $kv) {
+            return !isset($this->markedRefs[$kv->value()->getRefNum()]);
+        });
+    }
+
+    public function markReference(ServiceReference $ref) : ServiceTracker {
+        $this->markedRefs[$ref->getRefNum()] = true;
+        return $this;
+    }
+
+    public function unmarkReference(ServiceReference $ref) : ServiceTracker {
+        unset($this->markedRefs[$ref->getRefNum()]);
+        return $this;
     }
 
     /**

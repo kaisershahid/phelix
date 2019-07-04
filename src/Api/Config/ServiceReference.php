@@ -12,6 +12,12 @@ class ServiceReference implements \JsonSerializable {
     const KEY_UNBIND = 'unbind';
     const KEY_TARGET = 'target';
 
+    private static $refNumber = 0;
+
+    private static function getAndIncreaseRefNumber() {
+        return self::$refNumber++;
+    }
+
     /** @var string */
     private $interface;
     /** @var string */
@@ -24,6 +30,8 @@ class ServiceReference implements \JsonSerializable {
     private $unbind;
     /** @var string */
     private $target;
+    /** @var int */
+    private $refNum;
 
     public function __construct(array $arr) {
         $this->interface = Arr::get($arr, self::KEY_INTERFACE);
@@ -32,6 +40,7 @@ class ServiceReference implements \JsonSerializable {
         $this->bind = Arr::get($arr, self::KEY_BIND);
         $this->unbind = Arr::get($arr, self::KEY_UNBIND);
         $this->target = Arr::get($arr, self::KEY_TARGET);
+        $this->refNum = self::getAndIncreaseRefNumber();
     }
 
     /**
@@ -74,6 +83,13 @@ class ServiceReference implements \JsonSerializable {
      */
     public function getTarget(): ?string {
         return $this->target;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRefNum() : int {
+        return $this->refNum;
     }
 
     public function jsonSerialize() {
