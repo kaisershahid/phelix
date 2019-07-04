@@ -66,65 +66,20 @@ trait CollectionTrait {
         return $result;
     }
 
-    /**
-     * @param Collection $arr
-     * @return static|Collection
-     */
-    public function addAll(Collection $arr) : Collection {
-        $arr->traverse(function(KeyValue $kv) { $this[$kv->key()] = $kv->value(); });
-        return $this;
-    }
-
-    /**
-     * @param array $arr
-     * @return static|Collection
-     */
-    public function arrayAddAll(array $arr) : Collection {
-        $this->arr = array_merge($this->arr, $arr);
-        return $this;
-    }
-
-    /**
-     * @param callable $callback `function(KeyValue $kv) : {KeyValue|mixed}`
-     * @return static|Collection
-     */
-    public function map(callable $callback): Collection {
-        $arr = [];
-        foreach ($this->arr as $key => $val) {
-            $kv = $this->getNewKeyValue($key, $val);
-            $mapped = $callback($kv);
-            if ($mapped instanceof KeyValue) {
-                $arr[$mapped->key()] = $mapped->value();
-            } else {
-                $arr[$key] = $mapped;
-            }
-        }
-
-        return new static($arr);
-    }
-
-    /**
-     * @param callable $callback `function(KeyValue $kv) : boolean`
-     * @return static|Collection
-     */
-    public function filter(callable $callback): Collection {
-        $arr = [];
-        foreach ($this->arr as $key => $val) {
-            if ($callback($this->getNewKeyValue($key, $val))) {
-                $arr[$key] = $val;
-            }
-        }
-
-        return new static($arr);
-    }
-
     public function findFirst($value) {
         $idx = array_search($value, $this->arr, true);
         return $idx === false ? null : $idx;
     }
 
     public function find($value) : array {
-        return array_keys($this->arr, $value, true);
+        $keys = [];
+        foreach ($this->arr as $key => $ele) {
+            if ($ele === $value) {
+                $keys[]  = $key;
+            }
+        }
+
+        return $keys;
     }
 
     public function removeFirst($value) {

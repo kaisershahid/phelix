@@ -6,15 +6,15 @@ use DinoTech\StdLib\Collections\Traits\ArrayAccessTrait;
 use DinoTech\StdLib\Collections\Traits\CollectionTrait;
 use DinoTech\StdLib\Collections\Traits\CountableTrait;
 use DinoTech\StdLib\Collections\Traits\IteratorTrait;
+use DinoTech\StdLib\Collections\Traits\ListAddAllTrait;
 use DinoTech\StdLib\Collections\Traits\ListCollectionTrait;
+use DinoTech\StdLib\Collections\Traits\ListOperationsTrait;
 
 class StandardList implements ListCollection {
-    use CollectionTrait, ListCollectionTrait {
-        ListCollectionTrait::addAll insteadof CollectionTrait;
-        ListCollectionTrait::arrayAddAll insteadof CollectionTrait;
-        ListCollectionTrait::map insteadof CollectionTrait;
-        ListCollectionTrait::filter insteadof CollectionTrait;
-    }
+    use CollectionTrait;
+    use ListCollectionTrait;
+    use ListAddAllTrait;
+    use ListOperationsTrait;
     use ArrayAccessTrait;
     use IteratorTrait;
     use CountableTrait;

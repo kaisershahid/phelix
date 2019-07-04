@@ -13,6 +13,7 @@ use DinoTech\StdLib\KeyValue;
  * All operations can throw `UnsupportedOperationException`
  *
  * @todo add sort to interface
+ * @todo make IndexedCollection interface to contain key-type operations (and make as parent of List/Map)
  */
 interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializable {
     /**
@@ -20,6 +21,7 @@ interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializa
      * @param string $class
      * @return Collection
      * @throws \InvalidArgumentException
+     * @todo remove this from interface
      */
     public function setKeyValueClass($class) : Collection;
 
@@ -165,6 +167,7 @@ interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializa
      * @param array|Collection $other
      * @return DiffEntry[]|ListCollection
      * @throws UnsupportedOperationException
+     * @todo redefine this to only do diff by value
      */
     public function diff($other, bool $strict = true) : ListCollection;
 
@@ -172,14 +175,16 @@ interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializa
      * Returns set of keys in current collection not in other collection.
      * @param array|Collection $other
      * @return array
+     * @todo move to MapCollection
      */
     public function diffKeys($other) : array;
 
     /**
-     * Compares values by key and returns tne union.
+     * Compares values by key and returns the union.
      * @param array|Collection $other
      * @param bool $strict
-     * @return MapCollection
+     * @return Collection
+     * @todo redefine this to only do union by value and change to Collection
      */
     public function union($other, bool $strict = true) : MapCollection;
 
@@ -187,6 +192,7 @@ interface Collection extends \ArrayAccess, \Iterator, \Countable, \JsonSerializa
      * Returns set of keys in both current and other collection.
      * @param array|Collection $other
      * @return array
+     * @todo move to MapCollection
      */
     public function unionKeys($other) : array;
 }

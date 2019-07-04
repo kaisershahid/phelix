@@ -131,7 +131,7 @@ abstract class Enum {
     }
 
     public final function greaterThanOrEqual(Enum $other) {
-        return $this->compareRank() >= 0;
+        return $this->compareRank($other) >= 0;
     }
 
     public final function lessThan(Enum $other) {
