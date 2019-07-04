@@ -1,3 +1,4 @@
 bundles:
   - test-bundles/bundle-a
   - test-bundles/bundle-b
+  - test-bundles/bundle-c

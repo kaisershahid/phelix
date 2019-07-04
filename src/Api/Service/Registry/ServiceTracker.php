@@ -10,7 +10,7 @@ use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\Collections\StandardList;
 use PharIo\Manifest\Manifest;
 
-class ServiceTracker {
+class ServiceTracker implements \JsonSerializable {
     /** @var object */
     private $component;
     /** @var ServiceConfig */
@@ -32,7 +32,8 @@ class ServiceTracker {
         $this->manifest = $manifest;
         $this->refScoreboard = Scoreboard::makeForCardinality();
         $this->refs = new StandardList($config->getReferences()->values());
-        $this->status = LifecycleStatus::DISABLED();
+        $this->status = $config->getComponent()->isImmediate() ?
+            LifecycleStatus::UNSATISFIED() : LifecycleStatus::DISABLED();
         $this->initScoreboard();
     }
 
@@ -107,5 +108,16 @@ class ServiceTracker {
     public function setIntrospector(Introspector $introspector): ServiceTracker {
         $this->introspector = $introspector;
         return $this;
+    }
+
+    public function jsonSerialize() {
+        $data = [
+            'status' => $this->status->name(),
+            'refScoreboard' => $this->refScoreboard->jsonSerialize(),
+            'manifest' => $this->manifest->jsonSerialize(),
+            'serviceConfig' => $this->config->jsonSerialize(),
+        ];
+
+        return $data;
     }
 }

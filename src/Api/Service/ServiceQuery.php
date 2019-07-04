@@ -67,7 +67,7 @@ class ServiceQuery {
         }
 
         if ($ref->getInterface()) {
-            $predicates['service.interface'] = $ref->getInterface();
+            $predicates['interface'] = $ref->getInterface();
         }
 
         return new static($predicates);

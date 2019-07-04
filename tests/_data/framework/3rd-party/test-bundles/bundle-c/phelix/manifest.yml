@@ -1,0 +1,4 @@
+groupId: test-bundles
+bundleId: bundle-c
+version: 0.0.0
+namespace: DinoTech\BundleC

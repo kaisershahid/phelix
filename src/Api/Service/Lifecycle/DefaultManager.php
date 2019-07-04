@@ -8,6 +8,8 @@ use DinoTech\Phelix\Api\Service\ReferenceCardinality;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\Phelix\Api\Service\Registry\Scoreboard;
 use DinoTech\Phelix\Api\Service\Registry\ServiceTracker;
+use DinoTech\Phelix\Api\Service\Registry\TrackerKeyValue;
+use DinoTech\StdLib\KeyValue;
 
 class DefaultManager {
     /** @var Index */
@@ -48,8 +50,7 @@ class DefaultManager {
         $refs = $tracker->getRefs();
         foreach ($refs as $ref) {
             $cardinality = $ref->getCardinality();
-            $refQuery = $this->services->getReferenceQueryTracker($ref);
-
+            $refQuery = $this->services->addReference($ref);
             if ($cardinality->isMandatory()) {
                 if ($refQuery->hasOneSatisfied()) {
                     $tracker->getRefScoreboard()->decrease($cardinality);
@@ -59,7 +60,7 @@ class DefaultManager {
             }
         }
 
-        $this->activate($ref);
+        $this->activateIfReferencesSatisfied($tracker);
     }
 
     public function activateIfReferencesSatisfied(ServiceTracker $tracker) {
@@ -89,5 +90,25 @@ class DefaultManager {
             $tracker->setStatus(LifecycleStatus::ACTIVE());
             // @todo trigger service activation event
         }
+    }
+
+    /**
+     * Attempt to activate all satisfied services that aren't lazy-load.
+     * @return int
+     */
+    public function wakeUp() : int {
+        $this->services->getAllTrackers()->traverse(function(KeyValue $kv) {
+            /** @var ServiceTracker $t */
+            $t = $kv->value();
+            if ($t->getStatus() === LifecycleStatus::UNSATISFIED()) {
+                $this->resolveReferences($t);
+            } if ($t->getStatus() !== LifecycleStatus::SATISFIED()) {
+                return;
+            } else if (!$t->getConfig()->getComponent()->isImmediate()) {
+                return;
+            }
+        });
+
+        return 0;
     }
 }

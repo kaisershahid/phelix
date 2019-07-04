@@ -1,7 +1,7 @@
 <?php
-namespace DinoTech\BundleA;
+namespace DinoTech\BundleC;
 
-class MainService {
+class MainServiceC {
     protected function activate() {
         codecept_debug("activate: " . self::class);
     }

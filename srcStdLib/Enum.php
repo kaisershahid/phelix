@@ -10,6 +10,7 @@ use DinoTech\StdLib\Exceptions\EnumException;
  * Java-style enums. One thing to call out is `__postConstruct()`, which is called
  * at the end of the constructor. Define it to carry out additional decoration
  * for the enum to support complex values (if needed).
+ * @todo for comparison functions, check type
  */
 abstract class Enum {
     /** @var array list of constants to ignore when processing enums. */
@@ -125,12 +126,20 @@ abstract class Enum {
         }
     }
 
-    public final function rankedHigherThan(Enum $other) {
+    public final function greaterThan(Enum $other) {
         return $this->compareRank($other) == 1;
     }
 
-    public final function rankedLowerTHan(Enum $other) {
+    public final function greaterThanOrEqual(Enum $other) {
+        return $this->compareRank() >= 0;
+    }
+
+    public final function lessThan(Enum $other) {
         return $this->compareRank($other) == -1;
+    }
+
+    public final function lessThanOrEqual(Enum $other) {
+        return $this->compareRank($other) <= 0;
     }
 
     public function __toString() {

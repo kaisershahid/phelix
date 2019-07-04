@@ -37,14 +37,14 @@ class ServiceReference implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getInterface(): string {
+    public function getInterface(): ?string {
         return $this->interface;
     }
 
     /**
      * @return string
      */
-    public function getQuery(): string {
+    public function getQuery(): ?string {
         return $this->query;
     }
 
@@ -58,21 +58,21 @@ class ServiceReference implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getBind(): string {
+    public function getBind(): ?string {
         return $this->bind;
     }
 
     /**
      * @return string
      */
-    public function getUnbind(): string {
+    public function getUnbind(): ?string {
         return $this->unbind;
     }
 
     /**
      * @return string
      */
-    public function getTarget(): string {
+    public function getTarget(): ?string {
         return $this->target;
     }
 

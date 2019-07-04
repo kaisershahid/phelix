@@ -102,7 +102,17 @@ class ServiceConfig implements \JsonSerializable {
     }
 
     public function jsonSerialize() {
-        // @todo generate from current props
-        return $this->conf;
+        return [
+            'id' => $this->id,
+            'interface' => $this->interface,
+            'class' => $this->class,
+            'rank' => $this->rank,
+            'component' => $this->component,
+            // @todo properties
+            'metadata' => $this->metadata->jsonSerialize(),
+            'references' => array_map(function(ServiceReference $ref) {
+                return $ref->jsonSerialize();
+            }, $this->references)
+        ];
     }
 }

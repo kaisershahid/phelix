@@ -25,7 +25,7 @@ trait IteratorTrait {
 
     public function next() {
         $this->iterPos++;
-        $this->iterCurKey = $this->iterKeys[$this->iterPos];
+        $this->iterCurKey = ArrayUtils::get($this->iterKeys, $this->iterPos);
     }
 
     public function key() {
@@ -42,7 +42,7 @@ trait IteratorTrait {
         $this->iterCurKey = ArrayUtils::get($this->iterKeys, $this->iterPos);;
     }
 
-    public function clearIterator() : Collection {
+    protected function clearIterator() : Collection {
         $this->iterKeys = null;
         $this->iterCurKey = null;
         $this->iterPos = 0;

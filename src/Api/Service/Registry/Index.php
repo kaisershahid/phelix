@@ -9,7 +9,7 @@ use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\Collections\StandardSet;
 use DinoTech\StdLib\KeyValue;
 
-class Index {
+class Index implements \JsonSerializable {
     /** @var StandardList[] of trackers */
     private $services = [];
     /** @var ReferenceQueryTracker[] */
@@ -49,13 +49,9 @@ class Index {
      * @param ServiceReference $reference
      */
     public function addReference(ServiceReference $reference) {
-        $query = ServiceQuery::fromReference($reference);
-        $hash = $query->getHash();
-
-        if (!isset($this->references[$hash])) {
-            $refTrack = new ReferenceQueryTracker($query);
-            $this->references[$hash] = $refTrack;
-
+        $refTrack = $this->getReferenceQueryTracker($reference);
+        if ($refTrack === null) {
+            $refTrack = $this->makeReferenceQueryTracker($reference);
             $func = function(TrackerKeyValue $kv) use ($refTrack) {
                 $refTrack->addTrackerIfItMatchesQuery($kv->value());
             };
@@ -65,7 +61,7 @@ class Index {
             }
         }
 
-        return $this->references[$hash];
+        return $refTrack;
     }
 
     /**
@@ -75,12 +71,52 @@ class Index {
      * @throws \DinoTech\StdLib\Collections\UnsupportedOperationException
      */
     public function getComponentsByReference(ServiceReference $reference) : Collection {
-        $query = ServiceQuery::fromReference($reference);
-        $refQueryTracker = ArrayUtils::get($this->references, $query->getHash());
+        $refQueryTracker = $this->getReferenceQueryTracker($reference);
         if ($refQueryTracker !== null) {
             return $refQueryTracker->getServiceComponents();
         }
 
         return new StandardList();
+    }
+
+    public function getReferenceQueryTracker(ServiceReference $reference) : ?ReferenceQueryTracker {
+        $query = ServiceQuery::fromReference($reference);
+        return ArrayUtils::get($this->references, $query->getHash());
+    }
+
+    protected function makeReferenceQueryTracker(ServiceReference $reference) : ReferenceQueryTracker {
+        $query = ServiceQuery::fromReference($reference);
+        $refTrack = new ReferenceQueryTracker($query);
+        $this->references[$query->getHash()] = $refTrack;
+        return $refTrack;
+    }
+
+    public function jsonSerialize() {
+        $data = [];
+        $data['services'] = [];
+        foreach ($this->services as $interface => $servicesList) {
+            $data['services'][$interface] = [];
+            $servicesList->traverse(function(TrackerKeyValue $kv) use (&$data, $interface) {
+                $data['services'][$interface][$kv->key()] = $kv->value()->jsonSerialize();
+            });
+        }
+
+        return $data;
+    }
+
+    public function jsonSerializeExtended() {
+        $data = $this->jsonSerialize();
+        $data['refs'] = [];
+
+        return $data;
+    }
+
+    public function getAllTrackers() {
+        $trackers = new StandardList();
+        foreach ($this->services as $list) {
+            $trackers->addAll($list);
+        }
+
+        return $trackers;
     }
 }

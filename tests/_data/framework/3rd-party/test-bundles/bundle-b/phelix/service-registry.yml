@@ -8,10 +8,14 @@ services:
       abstract: false
       immediate: true
       enabled: true
+      activate: doActivate
     metadata:
       key: value
       another.key: another value
     references:
       -
-        service: DinoTech\BundleA\MainService
+        interface: DinoTech\BundleA\MainService
+        cardinality: ONE
+      -
+        interface: DinoTech\BundleC\MainServiceC
         cardinality: ONE

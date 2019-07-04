@@ -1,6 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Registry;
 
+use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\ServiceQuery;
 use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\Collections\StandardList;
@@ -65,5 +66,12 @@ class ReferenceQueryTracker {
 
     public function removeDependent(ServiceTracker $tracker) : ?ServiceTracker {
         return $this->dependentServiceTrackers->removeFirst($tracker);
+    }
+
+    public function hasOneSatisfied() : bool {
+        return $this->serviceTrackers->reduce(function(TrackerKeyValue $kv, $carry) {
+            $track = $kv->value();
+            return $carry || $track->getStatus()->greaterThan(LifecycleStatus::UNSATISFIED());
+        }, false);
     }
 }

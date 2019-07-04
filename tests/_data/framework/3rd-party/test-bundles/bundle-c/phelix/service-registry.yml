@@ -1,0 +1,11 @@
+# what a manual or generated service definition would look like
+services:
+    -
+      interface: DinoTech\BundleC\MainServiceC
+      class: DinoTech\BundleC\MainServiceC
+      rank: 5
+      component:
+        immediate: true
+        enabled: true
+        activate: activate
+        deactivate: deactivate

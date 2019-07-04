@@ -13,9 +13,9 @@ use DinoTech\StdLib\Enum;
  */
 class LifecycleStatus extends Enum {
     const DISABLED = 'disabled';
+    const ERROR = 'error';
     const STARTING = 'starting';
     const UNSATISFIED = 'unsatisfied';
     const SATISFIED = 'satisfied';
-    const ERROR = 'error';
     const ACTIVE = 'active';
 }
