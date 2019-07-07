@@ -1,6 +1,9 @@
 <?php
 namespace DinoTech\Phelix\Api\Bundle;
 
+use DinoTech\Phelix\Api\Event\Defaults\Event;
+use DinoTech\Phelix\Api\Event\Defaults\EventManager;
+use DinoTech\Phelix\Api\Event\EventManagerInterface;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\Collections\Collection;
@@ -22,10 +25,13 @@ class BundleRegistry {
     private $framework;
     /** @var ServiceRegistry */
     private $serviceRegistry;
+    /** @var EventManagerInterface */
+    private $eventManager;
 
     public function __construct() {
         $this->manifests = new StandardMap();
         $this->records = new StandardMap();
+        $this->eventManager = new EventManager();
     }
 
     /**
@@ -46,6 +52,15 @@ class BundleRegistry {
         return $this;
     }
 
+    /**
+     * @param EventManagerInterface $eventManager
+     * @return BundleRegistry
+     */
+    public function setEventManager(EventManagerInterface $eventManager): BundleRegistry {
+        $this->eventManager = $eventManager;
+        return $this;
+    }
+
     public function registerBundles(Collection $bmanifests) {
         $bmanifests->traverse(function(KeyValue $kv) {
             $this->registerBundle($kv->value());
@@ -59,6 +74,7 @@ class BundleRegistry {
         $record = (new BundleTracker())
             ->setManifest($manifest)
             ->setStatus(BundleStatus::REGISTERED());
+        $this->eventManager->dispatch(BundleEventTopics::REGISTERED, $manifest);
 
         $this->manifests[$id] = $manifest;
         $this->records[$id] = $record;
@@ -76,7 +92,7 @@ class BundleRegistry {
         $manifest = $record->getManifest();
         $activator = $this->checkForSourceRootAndActivator($manifest);
         if (!$activator) {
-            $activator = new DefaultActivator();
+            $activator = new DefaultActivatorInterface();
         }
 
         $record->setActivator($activator);
@@ -86,16 +102,18 @@ class BundleRegistry {
                 ->setManifest($manifest)
                 ->activate($this->serviceRegistry);
             $record->setStatus(BundleStatus::ACTIVE());
+            // @todo make BundleEvent
+            $this->eventManager->dispatch(BundleEventTopics::ACTIVATED, $manifest);
         } catch (\Exception $e) {
-            // @todo use better error capture
             error_log("ERROR: activating bundle $id: {$e->getMessage()}\n{$e->getTraceAsString()}");
             $record
                 ->setStatus(BundleStatus::ERROR())
                 ->setLifecycleException($e);
+            $this->eventManager->dispatch(BundleEventTopics::ERROR, $e);
         }
     }
 
-    protected function checkForSourceRootAndActivator(BundleManifest $manifest) : ?BundleActivator {
+    protected function checkForSourceRootAndActivator(BundleManifest $manifest) : ?BundleActivatorInterface {
         $bundleRoot = $manifest->getBundleRoot();
         $srcDir = $manifest->getSrcRoot();
 
@@ -122,11 +140,12 @@ class BundleRegistry {
 
     protected function stopBundle(string $id) {
         $record = $this->records[$id];
-        echo "-- stopBundle: $id\n";
         try {
+            $this->eventManager->dispatch(BundleEventTopics::DEACTIVATING, $record->getManifest());
             $record->getActivator()->deactivate($this->serviceRegistry);
         } catch (\Exception $e) {
             error_log("ERROR: deactivating bundle $id: {$e->getMessage()}\n{$e->getTraceAsString()}");
+            // @todo ERROR_DEACTIVATION topic?
         }
     }
 }

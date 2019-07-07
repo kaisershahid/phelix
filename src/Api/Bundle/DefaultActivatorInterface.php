@@ -8,7 +8,7 @@ use DinoTech\Phelix\Framework;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\StdLib\Filesys\Path;
 
-class DefaultActivator implements BundleActivator {
+class DefaultActivatorInterface implements BundleActivatorInterface {
     /** @var Framework */
     private $framework;
     /** @var BundleManifest */
@@ -16,12 +16,12 @@ class DefaultActivator implements BundleActivator {
     /** @var array */
     private $serviceConfig;
 
-    public function setFramework(Framework $framework): BundleActivator {
+    public function setFramework(Framework $framework): BundleActivatorInterface {
         $this->framework = $framework;
         return $this;
     }
 
-    public function setManifest(BundleManifest $manifest): BundleActivator {
+    public function setManifest(BundleManifest $manifest): BundleActivatorInterface {
         $this->manifest = $manifest;
         return $this;
     }

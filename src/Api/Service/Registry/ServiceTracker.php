@@ -78,9 +78,19 @@ class ServiceTracker implements \JsonSerializable {
      * Returns all unmarked references.
      * @return ServiceReference[]|ListCollection
      */
-    public function getRefs(): ListCollection {
+    public function getUnmarkedReferences() : ListCollection {
         return $this->refs->filter(function(KeyValue $kv) {
             return !isset($this->markedRefs[$kv->value()->getRefNum()]);
+        });
+    }
+
+    /**
+     * Returns all marked references.
+     * @return ServiceReference[]|ListCollection
+     */
+    public function getMarkedReferences() : ListCollection {
+        return $this->refs->filter(function(KeyValue $kv) {
+            return isset($this->markedRefs[$kv->value()->getRefNum()]);
         });
     }
 

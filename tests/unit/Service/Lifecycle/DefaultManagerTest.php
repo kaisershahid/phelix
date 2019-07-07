@@ -45,7 +45,7 @@ class DefaultManagerTest extends Unit {
     /**
      * Loads bundles A, B, and C, and ensures bundle B's service is activated once all bundles are started.
      */
-    public function testLoadBundleAServices() {
+    public function testServiceActivationThruLoadingBundlesOutOfOrder() {
         $this->registry->loadBundle($this->bundleManifestA);
         $this->registry->loadBundle($this->bundleManifestB);
         $this->registry->loadBundle($this->bundleManifestC);
@@ -59,5 +59,9 @@ class DefaultManagerTest extends Unit {
         ];
 
         $this->assertArraySubset($expectBundleBSatisfied, $this->services->jsonSerialize()['services']);
+    }
+
+    public function testServiceDeactionOfMainServiceC() {
+
     }
 }

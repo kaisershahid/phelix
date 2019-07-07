@@ -6,6 +6,7 @@ use DinoTech\Phelix\Api\Bundle\BundleReader;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
 use DinoTech\Phelix\Api\Config\ServiceReference;
 use DinoTech\Phelix\Api\Config\ServiceRegistryConfig;
+use DinoTech\Phelix\Api\Event\EventManagerInterface;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\StdLib\Collections\Collection;
@@ -15,12 +16,24 @@ class ServiceRegistry {
     private $services;
     /** @var DefaultManager */
     private $manager;
+    /** @var EventManagerInterface */
+    private $eventManager;
 
     private $pendingServices;
 
     public function __construct(Index $services = null, DefaultManager $manager = null) {
         $this->services = $services ?: new Index();
         $this->manager = $manager ?: new DefaultManager($this->services);
+    }
+
+    /**
+     * @param EventManagerInterface $eventManager
+     * @return ServiceRegistry
+     */
+    public function setEventManager(EventManagerInterface $eventManager): ServiceRegistry {
+        $this->eventManager = $eventManager;
+        $this->manager->setEventManager($eventManager);
+        return $this;
     }
 
     /**

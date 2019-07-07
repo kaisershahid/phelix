@@ -2,12 +2,16 @@
 namespace DinoTech\Phelix\Api\Service\Lifecycle;
 
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
+use DinoTech\Phelix\Api\Config\FrameworkConfig;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
+use DinoTech\Phelix\Api\Event\Defaults\EventManager;
+use DinoTech\Phelix\Api\Event\EventManagerInterface;
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\Phelix\Api\Service\Registry\Scoreboard;
 use DinoTech\Phelix\Api\Service\Registry\ServiceTracker;
 use DinoTech\Phelix\Api\Service\Registry\TrackerKeyValue;
+use DinoTech\Phelix\Api\Service\ServiceEventTopics;
 use DinoTech\Phelix\Api\Service\ServiceQuery;
 use DinoTech\Phelix\Framework;
 use DinoTech\StdLib\KeyValue;
@@ -19,18 +23,29 @@ use DinoTech\StdLib\KeyValue;
  *
  * @todo make an interface LifecycleManager
  * @todo track service activation order to provide insights into optimizing for other managers
+ * @todo ensure service list returns by rank (or allows retrieving highest rank)
  */
 class DefaultManager {
+    /** @var EventManagerInterface */
+    private $eventManager;
     /** @var Index */
     private $services;
-    /** @var ServiceTracker[] */
-    private $servicesInWaiting = [];
     /** @var Scoreboard */
     private $depScoreboard;
 
     public function __construct(Index $services) {
         $this->services = $services;
         $this->depScoreboard = Scoreboard::makeForCardinality();
+        $this->eventManager = new EventManager();
+    }
+
+    /**
+     * @param EventManagerInterface $eventManager
+     * @return DefaultManager
+     */
+    public function setEventManager(EventManagerInterface $eventManager): DefaultManager {
+        $this->eventManager = $eventManager;
+        return $this;
     }
 
     public function startService(ServiceConfig $config, BundleManifest $manifest) {
@@ -43,7 +58,7 @@ class DefaultManager {
         $tracker = new ServiceTracker($component, $config, $manifest);
         $tracker->setIntrospector(new Introspector($component));
         $this->services->add($tracker);
-        $refs = $tracker->getRefs();
+        $refs = $tracker->getUnmarkedReferences();
         if ($refs->count() > 0) {
             $this->resolveReferences($tracker);
         } else {
@@ -52,7 +67,7 @@ class DefaultManager {
     }
 
     public function resolveReferences(ServiceTracker $tracker) {
-        $refs = $tracker->getRefs();
+        $refs = $tracker->getUnmarkedReferences();
         foreach ($refs as $ref) {
             $cardinality = $ref->getCardinality();
             $refQuery = $this->services->addReference($ref);
@@ -90,26 +105,30 @@ class DefaultManager {
             return;
         }
 
+        // $thi->bindReferences($tracker); @todo bind references
+
         // @todo resolve configuration & merge with metadata
         $activation = $tracker->getConfig()->getComponent()->getActivate();
         if ($activation) {
+            // @todo move to invokeActivation method
             try {
                 // @todo send ServiceProperties instead of metadata
-                // @todo bind references
                 Framework::debug("activating {$tracker->getConfig()->getId()}");
                 $tracker->getIntrospector()
                     ->invokeMethod($activation, $tracker->getConfig()->getMetadata());
                 $tracker->setStatus(LifecycleStatus::ACTIVE());
                 $this->updateDependents($tracker);
-                // @todo trigger service activation event
+                // @todo make ServiceEvent
+                $this->eventManager->dispatch(ServiceEventTopics::ACTIVATED, $tracker->getConfig());
             } catch (\Exception $e) {
-                codecept_debug($e->getMessage());
+                Framework::debug("activate(): {$e->getMessage()}");
                 // @todo capture exception message in tracker & log
                 $tracker->setStatus(LifecycleStatus::ERROR());
+                $this->eventManager->dispatch(ServiceEventTopics::ERROR, $tracker->getConfig());
             }
         } else {
             $tracker->setStatus(LifecycleStatus::ACTIVE());
-            // @todo trigger service activation event
+            $this->eventManager->dispatch(ServiceEventTopics::ACTIVATED, $tracker->getConfig());
         }
     }
 
@@ -154,5 +173,48 @@ class DefaultManager {
         // @todo fetch trackers
         // @todo activate satisfied services
         // @todo return components
+    }
+
+    public function deactivate(ServiceTracker $tracker) {
+        $deactivation = $tracker->getConfig()->getComponent()->getDeactivate();
+        if ($deactivation) {
+            try {
+                $this->eventManager->dispatch(ServiceEventTopics::DEACTIVATING, $tracker->getConfig());
+                $this->unresolveReferences($tracker);
+                $tracker->getIntrospector()
+                    ->invokeMethod($deactivation, $tracker->getConfig()->getMetadata());
+            } catch (\Exception $e) {
+                Framework::debug("deactivate(): {$e->getMessage()}");
+            }
+        }
+
+        // $this->unbindReferences($tracker); @todo unbind all references
+        $tracker->setStatus(LifecycleStatus::DISABLED());
+        // @todo invoke wakeUp() if dependent services can be fulfilled from another service
+    }
+
+    public function deactivateDependents(ServiceTracker $tracker) {
+        $this->services->getDependentsForService($tracker)
+            ->traverse((function(KeyValue $kv) {
+                /** @var ServiceTracker $t */
+                $t = $kv->value();
+                $this->deactivate($t);
+            }));
+    }
+
+    /**
+     * Puts service back in unfilfilled state by increasing its outstanding reference counts.
+     * @param ServiceTracker $tracker
+     */
+    public function unresolveReferences(ServiceTracker $tracker) {
+        $refs = $tracker->getMarkedReferences();
+        foreach ($refs as $ref) {
+            $cardinality = $ref->getCardinality();
+            $refQuery = $this->services->getReferenceQueryTracker($ref);
+            $tracker->unmarkReference($ref);
+            $tracker->getRefScoreboard()->increase($cardinality);
+        }
+
+        $tracker->setStatus(LifecycleStatus::UNSATISFIED());
     }
 }

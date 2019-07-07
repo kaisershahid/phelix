@@ -6,7 +6,7 @@ class BundleTracker {
     private $manifest;
     /** @var BundleStatus */
     private $status;
-    /** @var BundleActivator */
+    /** @var BundleActivatorInterface */
     private $activator;
     /** @var \Exception */
     private $lifecycleException;
@@ -44,17 +44,17 @@ class BundleTracker {
     }
 
     /**
-     * @return BundleActivator
+     * @return BundleActivatorInterface
      */
-    public function getActivator(): ?BundleActivator {
+    public function getActivator(): ?BundleActivatorInterface {
         return $this->activator;
     }
 
     /**
-     * @param BundleActivator $activator
+     * @param BundleActivatorInterface $activator
      * @return BundleTracker
      */
-    public function setActivator(BundleActivator $activator): BundleTracker {
+    public function setActivator(BundleActivatorInterface $activator): BundleTracker {
         $this->activator = $activator;
         return $this;
     }

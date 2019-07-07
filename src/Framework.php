@@ -8,6 +8,11 @@ use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
 use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
 use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
 use DinoTech\Phelix\Api\Config\FrameworkConfig;
+use DinoTech\Phelix\Api\Event\Defaults\EventManager;
+use DinoTech\Phelix\Api\Event\EventHandlerInterface;
+use DinoTech\Phelix\Api\Event\EventInterface;
+use DinoTech\Phelix\Api\Event\EventManagerInterface;
+use DinoTech\Phelix\Api\Service\ServiceQuery;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\StdLib\Filesys\Path;
 
@@ -15,7 +20,7 @@ use DinoTech\StdLib\Filesys\Path;
  * Coordinates initial configuration and booting, and provides read-only access
  * to the service registry.
  */
-class Framework {
+class Framework implements EventManagerInterface{
     private static $instance;
 
     const DEFAULT_ENV         = 'dev';
@@ -95,16 +100,19 @@ class Framework {
     private $bundleRegistry;
     /** @var ServiceRegistry */
     private $serviceRegistry;
-    /** @var TBD */
-    private $eventListeners;
+    /** @var EventManagerInterface */
+    private $eventManager;
 
     public function __construct(string $env = self::DEFAULT_ENV) {
         $this->env = new Env($env);
         $this->root = getcwd();
-        $this->serviceRegistry = new ServiceRegistry();
+        $this->eventManger = new EventManager();
+        $this->serviceRegistry = (new ServiceRegistry())
+            ->setEventManager($this->eventManager);
         $this->bundleRegistry = (new BundleRegistry())
             ->setFramework($this)
-            ->setServiceRegistry($this->serviceRegistry);
+            ->setServiceRegistry($this->serviceRegistry)
+            ->setEventManager($this->eventManager);
         register_shutdown_function(function() {
             $this->shutdown();
         });
@@ -206,8 +214,34 @@ class Framework {
         $this->bundleRegistry->registerBundles($bootManifests->addAll($libManifests));
     }
 
+    public function getService($interface) {
+        return $this->serviceRegistry->getByInterface($interface);
+    }
+
+    public function getServiceByQuery(ServiceQuery $query) {
+        // @todo support string and have ServiceQuery::frompExpression($query)
+        throw new \Exception('not implemented');
+    }
+
+    public function registerEventHandler(EventHandlerInterface $handler, array $topics) {
+        $this->eventManager->registerEventHandler($handler, $topics);
+    }
+
+    public function unregisterEventHandler(EventHandlerInterface $handler) {
+        $this->eventManager->unregisterEventHandler($handler);
+    }
+
+    public function dispatch($topic, $payload = null, $payloadType = null) {
+        $this->eventManager->dispatch($topic, $payload, $payloadType);
+    }
+
+    public function dispatchEvent(EventInterface $event) {
+        $this->eventManager->dispatchEvent($event);
+    }
+
     protected function shutdown() {
-        echo "--- shutdown ---\n";
+        self::debug("shutdown() -- STARTING");
         $this->bundleRegistry->stopBundles();
+        self::debug("shutdown() -- ENDED");
     }
 }

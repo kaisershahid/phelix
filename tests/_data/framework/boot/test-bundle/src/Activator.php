@@ -1,13 +1,13 @@
 <?php
 namespace DinoTech\TestBundle;
 
-use DinoTech\Phelix\Api\Bundle\BundleActivator;
+use DinoTech\Phelix\Api\Bundle\BundleActivatorInterface;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
-use DinoTech\Phelix\Api\Bundle\DefaultActivator;
+use DinoTech\Phelix\Api\Bundle\DefaultActivatorInterface;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
 
-class Activator extends DefaultActivator {
+class Activator extends DefaultActivatorInterface {
     public function activate(ServiceRegistry $serviceRegistry) {
         echo self::class . " >> activate()\n";
         $conf = $this->getServiceRegistryConfig();
