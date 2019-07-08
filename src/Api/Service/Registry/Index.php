@@ -54,6 +54,23 @@ class Index implements \JsonSerializable {
         }
     }
 
+    public function search(ServiceQuery $query) : ReferenceQueryTracker {
+        $refTrack = new ReferenceQueryTracker($query);
+        $this->fillReferenceTracker($refTrack);
+        return $refTrack;
+    }
+
+    public function fillReferenceTracker(ReferenceQueryTracker $refTrack) {
+        $func = function(TrackerKeyValue $kv) use ($refTrack) {
+            $refTrack->addTrackerIfItMatchesQuery($kv->value());
+        };
+
+        foreach ($this->services as $list) {
+            Framework::debug("fillReferenceTracker ({$refTrack->getHash()}): back-adding");
+            $list->traverse($func);
+        }
+    }
+
     /**
      * Adds a service reference to cache, and adds existing services that match
      * the query.
@@ -63,14 +80,7 @@ class Index implements \JsonSerializable {
         $refTrack = $this->getReferenceQueryTracker($reference);
         if ($refTrack === null) {
             $refTrack = $this->makeReferenceQueryTracker($reference);
-            $func = function(TrackerKeyValue $kv) use ($refTrack) {
-                $refTrack->addTrackerIfItMatchesQuery($kv->value());
-            };
-
-            foreach ($this->services as $list) {
-                Framework::debug("addReference ({$refTrack->getHash()}): back-adding");
-                $list->traverse($func);
-            }
+            $this->fillReferenceTracker($refTrack);
         }
 
         return $refTrack;
@@ -92,7 +102,10 @@ class Index implements \JsonSerializable {
     }
 
     public function getReferenceQueryTracker(ServiceReference $reference) : ?ReferenceQueryTracker {
-        $query = ServiceQuery::fromReference($reference);
+        return $this->getQueryTracker(ServiceQuery::fromReference($reference));
+    }
+
+    public function getQueryTracker(ServiceQuery $query) : ?ReferenceQueryTracker {
         return ArrayUtils::get($this->references, $query->getHash());
     }
 

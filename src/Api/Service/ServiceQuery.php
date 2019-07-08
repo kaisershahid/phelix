@@ -72,4 +72,8 @@ class ServiceQuery {
 
         return new static($predicates);
     }
+
+    public static function fromInterface($interface) {
+        return new static(['interface' => $interface]);
+    }
 }

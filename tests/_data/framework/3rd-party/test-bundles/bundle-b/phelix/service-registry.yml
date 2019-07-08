@@ -16,6 +16,9 @@ services:
       -
         interface: DinoTech\BundleA\MainService
         cardinality: ONE
+        bind: bindMain
+        unbind: unbindMain
       -
         interface: DinoTech\BundleC\MainServiceC
         cardinality: ONE
+        target: serviceC

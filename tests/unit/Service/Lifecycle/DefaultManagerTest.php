@@ -2,6 +2,8 @@
 namespace DinoTech\Phelix\tests\unit\Service\Lifecycle;
 
 use Codeception\Test\Unit;
+use DinoTech\BundleB\DependentService;
+use DinoTech\BundleC\MainServiceC;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
 use DinoTech\Phelix\Api\Bundle\Loaders\FilesysReader;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
@@ -59,6 +61,11 @@ class DefaultManagerTest extends Unit {
         ];
 
         $this->assertArraySubset($expectBundleBSatisfied, $this->services->jsonSerialize()['services']);
+
+        /** @var DependentService $depService */
+        $depService = $this->subject->getService(DependentService::class);
+        $this->assertNotNull($depService);
+        $this->assertInstanceOf(MainServiceC::class, $depService->getServiceC());
     }
 
     public function testServiceDeactionOfMainServiceC() {

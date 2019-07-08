@@ -33,6 +33,26 @@ class ReferenceQueryTracker {
         $this->dependentServiceTrackers = new StandardSet();
     }
 
+    /**
+     * Returns primary trackers in ranked order.
+     */
+    public function getTrackersByRank() : ListCollection {
+        $trackers = $this->serviceTrackers->values();
+        usort($trackers, function(ServiceTracker $left, ServiceTracker $right) {
+            $lrank = $left->getConfig()->getRank();
+            $rrank = $right->getConfig()->getRank();
+            if ($lrank > $rrank) {
+                return 1;
+            } else if ($lrank < $rrank) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        return new StandardList($trackers);
+    }
+
     public function addTrackerIfItMatchesQuery(ServiceTracker $tracker) {
         if ($this->query->matchByConfig($tracker->getConfig())) {
             $this->addTracker($tracker);

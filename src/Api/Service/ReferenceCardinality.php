@@ -2,6 +2,7 @@
 namespace DinoTech\Phelix\Api\Service;
 
 use DinoTech\StdLib\Enum;
+use DinoTech\StdLib\Strings\StringUtils as Str;
 
 /**
  * @method static ONE()
@@ -28,6 +29,14 @@ class ReferenceCardinality extends Enum {
     const MANY_OPTIONAL = false;
 
     public function isMandatory() : bool {
-        return $this->value();
+        return !Str::contains('OPTIONAL', $this->name());
+    }
+
+    public function isOne() {
+        return Str::contains('ONE', $this->name());
+    }
+
+    public function isMany() {
+        return !$this->isOne();
     }
 }

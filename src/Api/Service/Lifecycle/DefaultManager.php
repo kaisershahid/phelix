@@ -4,6 +4,7 @@ namespace DinoTech\Phelix\Api\Service\Lifecycle;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
 use DinoTech\Phelix\Api\Config\FrameworkConfig;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
+use DinoTech\Phelix\Api\Config\ServiceReference;
 use DinoTech\Phelix\Api\Event\Defaults\EventManager;
 use DinoTech\Phelix\Api\Event\EventManagerInterface;
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
@@ -13,7 +14,11 @@ use DinoTech\Phelix\Api\Service\Registry\ServiceTracker;
 use DinoTech\Phelix\Api\Service\Registry\TrackerKeyValue;
 use DinoTech\Phelix\Api\Service\ServiceEventTopics;
 use DinoTech\Phelix\Api\Service\ServiceQuery;
+use DinoTech\Phelix\Api\Service\ServiceRegistryInterface;
 use DinoTech\Phelix\Framework;
+use DinoTech\StdLib\Collections\Collection;
+use DinoTech\StdLib\Collections\ListCollection;
+use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\KeyValue;
 
 /**
@@ -25,7 +30,7 @@ use DinoTech\StdLib\KeyValue;
  * @todo track service activation order to provide insights into optimizing for other managers
  * @todo ensure service list returns by rank (or allows retrieving highest rank)
  */
-class DefaultManager {
+class DefaultManager implements ServiceRegistryInterface {
     /** @var EventManagerInterface */
     private $eventManager;
     /** @var Index */
@@ -46,6 +51,42 @@ class DefaultManager {
     public function setEventManager(EventManagerInterface $eventManager): DefaultManager {
         $this->eventManager = $eventManager;
         return $this;
+    }
+
+    public function getService($interface) {
+        /** @var ServiceTracker[]|Collection $services */
+        $services = $this->getServices($interface);
+        if ($services->count() > 0) {
+            return $services[0]->getComponent();
+        }
+
+        return null;
+    }
+
+    public function getServices($interface): Collection {
+        return $this->getServicesByQuery(ServiceQuery::fromInterface($interface));
+    }
+
+    public function getServicesByReference(ServiceReference $reference): Collection {
+        return $this->getServicesByQuery(ServiceQuery::fromReference($reference));
+    }
+
+    public function getServicesByQuery(ServiceQuery $query): Collection {
+        $services = $this->services->search($query);
+        if ($services === null) {
+            return new StandardList();
+        }
+
+        return $services->getTrackersByRank()
+            ->filter(function(KeyValue $kv) {
+                /** @var ServiceTracker $t */
+                $t = $kv->value();
+                if ($t->getStatus() === LifecycleStatus::SATISFIED()) {
+                    $this->activateIfReferencesSatisfied($t, true);
+                }
+
+                return $t->getStatus()->greaterThanOrEqual(LifecycleStatus::SATISFIED());
+            });
     }
 
     public function startService(ServiceConfig $config, BundleManifest $manifest) {
@@ -89,10 +130,14 @@ class DefaultManager {
         $this->activateIfReferencesSatisfied($tracker);
     }
 
-    public function activateIfReferencesSatisfied(ServiceTracker $tracker) {
-        if ($tracker->getRefScoreboard()->getTotalScore() <= 0) {
+    public function activateIfReferencesSatisfied(ServiceTracker $tracker, $forceActivation = false) {
+        if ($tracker->getStatus() == LifecycleStatus::ACTIVE()) {
+            return;
+        }
+
+        if ($tracker->getRefScoreboard()->getTotalScore() == 0) {
             $tracker->setStatus(LifecycleStatus::SATISFIED());
-            if ($tracker->getConfig()->getComponent()->isImmediate()) {
+            if ($tracker->getConfig()->getComponent()->isImmediate() || $forceActivation) {
                 $this->activate($tracker);
             }
         } else {
@@ -105,7 +150,8 @@ class DefaultManager {
             return;
         }
 
-        // $thi->bindReferences($tracker); @todo bind references
+        // @todo catch exception
+        (new ReferenceBinder($this->services, $tracker))->bind();
 
         // @todo resolve configuration & merge with metadata
         $activation = $tracker->getConfig()->getComponent()->getActivate();
@@ -169,12 +215,6 @@ class DefaultManager {
         return $trackers->count() - $activeCount;
     }
 
-    public function getService(ServiceQuery $query) {
-        // @todo fetch trackers
-        // @todo activate satisfied services
-        // @todo return components
-    }
-
     public function deactivate(ServiceTracker $tracker) {
         $deactivation = $tracker->getConfig()->getComponent()->getDeactivate();
         if ($deactivation) {
@@ -185,10 +225,12 @@ class DefaultManager {
                     ->invokeMethod($deactivation, $tracker->getConfig()->getMetadata());
             } catch (\Exception $e) {
                 Framework::debug("deactivate(): {$e->getMessage()}");
+                // @todo dispatch ERROR_DEACTIVATING?
             }
         }
 
-        // $this->unbindReferences($tracker); @todo unbind all references
+        // @todo catch exception
+        (new ReferenceBinder($this->services, $tracker))->unbind();
         $tracker->setStatus(LifecycleStatus::DISABLED());
         // @todo invoke wakeUp() if dependent services can be fulfilled from another service
     }

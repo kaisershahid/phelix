@@ -16,4 +16,10 @@ class Introspector {
         $meth->setAccessible(true);
         return $meth->invokeArgs($this->component, $args);
     }
+
+    public function setProperty($name, $value) {
+        $prop = $this->reflection->getProperty($name);
+        $prop->setAccessible(true);
+        $prop->setValue($this->component, $value);
+    }
 }

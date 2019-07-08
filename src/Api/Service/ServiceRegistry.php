@@ -10,8 +10,9 @@ use DinoTech\Phelix\Api\Event\EventManagerInterface;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\StdLib\Collections\Collection;
+use DinoTech\StdLib\Collections\ListCollection;
 
-class ServiceRegistry {
+class ServiceRegistry implements ServiceRegistryInterface {
     /** @var Index */
     private $services;
     /** @var DefaultManager */
@@ -36,29 +37,20 @@ class ServiceRegistry {
         return $this;
     }
 
-    /**
-     * @param string $interface
-     * @return object|null
-     */
-    public function getByInterface(string $interface) {
-        return $this->services->get($interface);
+    public function getService($interface) {
+        return $this->manager->getService($interface);
     }
 
-    /**
-     * @param string $interface
-     * @return array
-     */
-    public function getManyByInterface(string $interface) : array {
-        return $this->services->getAll($interface);
+    public function getServices($interface): Collection {
+        return $this->manager->getServices($interface);
     }
 
-    /**
-     * @param ServiceReference $ref
-     * @return Collection
-     * @throws \DinoTech\StdLib\Collections\UnsupportedOperationException
-     */
-    public function getByReference(ServiceReference $ref) : Collection {
-        return $this->services->getComponentsByReference($ref);
+    public function getServicesByQuery(ServiceQuery $query): Collection {
+        return $this->manager->getServicesByQuery($query);
+    }
+
+    public function getServicesByReference(ServiceReference $reference): Collection {
+        return $this->manager->getServicesByReference($reference);
     }
 
     public function loadBundle(BundleManifest $manifest) {
