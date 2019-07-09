@@ -7,6 +7,7 @@ use DinoTech\BundleC\MainServiceC;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
 use DinoTech\Phelix\Api\Bundle\Loaders\FilesysReader;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
+use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\Registry\Index;
 use DinoTech\Phelix\Api\Service\ServiceRegistry;
 use DinoTech\Phelix\Framework;
@@ -39,19 +40,20 @@ class DefaultManagerTest extends Unit {
         $this->services = new Index();
         $this->subject = new DefaultManager($this->services);
         $this->registry = new ServiceRegistry($this->services, $this->subject);
+
         $this->bundleManifestA = (new FilesysReader())->setRoot($root . '/bundle-a')->loadManifest();
         $this->bundleManifestB = (new FilesysReader())->setRoot($root . '/bundle-b')->loadManifest();
         $this->bundleManifestC = (new FilesysReader())->setRoot($root . '/bundle-c')->loadManifest();
+
+        $this->registry->loadBundle($this->bundleManifestC);
+        $this->registry->loadBundle($this->bundleManifestA);
+        $this->registry->loadBundle($this->bundleManifestB);
     }
 
     /**
      * Loads bundles A, B, and C, and ensures bundle B's service is activated once all bundles are started.
      */
-    public function testServiceActivationThruLoadingBundlesOutOfOrder() {
-        $this->registry->loadBundle($this->bundleManifestA);
-        $this->registry->loadBundle($this->bundleManifestB);
-        $this->registry->loadBundle($this->bundleManifestC);
-
+    public function testServiceSatisfiedThruLoadingBundlesOutOfOrder() {
         $expectBundleBSatisfied = [
             'DinoTech\BundleB\DependentService' => [
                 [
@@ -61,14 +63,24 @@ class DefaultManagerTest extends Unit {
         ];
 
         $this->assertArraySubset($expectBundleBSatisfied, $this->services->jsonSerialize()['services']);
+    }
 
+    /**
+     * Ensures lazy-loaded service gets activated upon first request, and confirms
+     * the service tracker is consistently bound to the same instance.
+     */
+    public function testServiceActivationOfDependent() {
         /** @var DependentService $depService */
+        $depServiceTracker = $this->subject->getServiceTracker(DependentService::class);
+        $this->assertEquals(LifecycleStatus::ACTIVE(), $depServiceTracker->getStatus());
         $depService = $this->subject->getService(DependentService::class);
-        $this->assertNotNull($depService);
+        $this->assertEquals($depServiceTracker->getComponent(), $depService);
         $this->assertInstanceOf(MainServiceC::class, $depService->getServiceC());
     }
 
     public function testServiceDeactionOfMainServiceC() {
-
+        $depServiceTracker = $this->subject->getServiceTracker(DependentService::class);
+        $this->subject->stopService($depServiceTracker);
+        $this->assertEquals(LifecycleStatus::UNSATISFIED(), $depServiceTracker->getStatus());
     }
 }
