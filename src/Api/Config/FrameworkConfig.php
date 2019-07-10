@@ -39,7 +39,8 @@ class FrameworkConfig implements MapCollection {
         'framework' => [
             'path.tmp' => './var/tmp',
             'path.log' => './var/log',
-            'path.cache' => './var/cache'
+            'path.cache' => './var/cache',
+            'path.config' => './config'
         ],
         'bundlesBoot' => [
             './bundles'

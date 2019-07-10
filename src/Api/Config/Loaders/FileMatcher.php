@@ -10,9 +10,9 @@ use DinoTech\StdLib\KeyValue;
  * applies to the portion matched in `*`.
  */
 class FileMatcher {
-    private $root;
-    private $base;
-    private $info = [];
+    protected $root;
+    protected $base;
+    protected $info = [];
 
     public function __construct(string $baseFile, string $root = null) {
         $this->root = $root ?: getcwd();
@@ -30,7 +30,7 @@ class FileMatcher {
      * @return array
      */
     public function getMatchingSuffixes() : array {
-        $base = $this->info->dirname() . '/' . $this->info->filename() . '.';
+        $base = $this->getBase();
         $ext = $this->info->extension();
         $remStart = strlen($base);
         $remEnd = 0 - strlen($ext) - 1;
@@ -40,10 +40,24 @@ class FileMatcher {
         }
 
         $pattern = $this->info->dirname() . '/' . $this->getNamePattern();
+        $filtered = array_filter(glob($pattern), [$this, 'filterPath']);
         return
             array_map(function(string $filePath) use ($remStart, $remEnd) {
                 return substr($filePath, $remStart, $remEnd);
-            }, glob($pattern));
+            }, $filtered);
+    }
+
+    public function getBase() : string {
+        return $this->info->dirname() . '/' . $this->info->filename() . '.';
+    }
+
+    /**
+     * Determines whether to use or discard path.
+     * @param string $path The absolute path to check
+     * @return bool
+     */
+    public function filterPath(string $path) : bool {
+        return is_file($path);
     }
 
     public function getNamePattern() {

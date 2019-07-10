@@ -9,14 +9,13 @@ use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\StdLib\Collections\ListCollection;
 use DinoTech\StdLib\Collections\StandardList;
 use DinoTech\StdLib\KeyValue;
-use PharIo\Manifest\Manifest;
 
 class ServiceTracker implements \JsonSerializable {
     /** @var object */
     private $component;
     /** @var ServiceConfig */
     private $config;
-    /** @var Manifest */
+    /** @var BundleManifest */
     private $manifest;
     /** @var Scoreboard */
     private $refScoreboard;
@@ -63,7 +62,7 @@ class ServiceTracker implements \JsonSerializable {
     /**
      * @return Manifest
      */
-    public function getManifest(): Manifest {
+    public function getManifest(): BundleManifest {
         return $this->manifest;
     }
 

@@ -6,6 +6,7 @@ use DinoTech\BundleB\DependentService;
 use DinoTech\BundleC\MainServiceC;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
 use DinoTech\Phelix\Api\Bundle\Loaders\FilesysReader;
+use DinoTech\Phelix\Api\Config\Binders\Filesys;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\Registry\Index;
@@ -30,15 +31,17 @@ class DefaultManagerTest extends Unit {
     public function _before() {
         Framework::$debugEnabled = true;
         Framework::$debugFunc = 'codecept_debug';
-        $root = codecept_data_dir() . '/framework/3rd-party/test-bundles';
+        $root = codecept_data_dir('/framework/3rd-party/test-bundles');
         // @todo make a bundle helper
         Framework::registerNamespace('DinoTech\\BundleA', "{$root}/bundle-a/src");
         Framework::registerNamespace('DinoTech\\BundleB', "{$root}/bundle-b/src");
         Framework::registerNamespace('DinoTech\\BundleC', "{$root}/bundle-c/src");
         Framework::registerAutoloader();
 
+        $confRoot = codecept_data_dir('/framework/config');
+        $confBinder = new Filesys($confRoot);
         $this->services = new Index();
-        $this->subject = new DefaultManager($this->services);
+        $this->subject = (new DefaultManager($this->services))->setConfigBinder($confBinder);
         $this->registry = new ServiceRegistry($this->services, $this->subject);
 
         $this->bundleManifestA = (new FilesysReader())->setRoot($root . '/bundle-a')->loadManifest();
@@ -82,5 +85,10 @@ class DefaultManagerTest extends Unit {
         $depServiceTracker = $this->subject->getServiceTracker(DependentService::class);
         $this->subject->stopService($depServiceTracker);
         $this->assertEquals(LifecycleStatus::UNSATISFIED(), $depServiceTracker->getStatus());
+    }
+
+    public function testConfigBinding() {
+        $depService = $this->subject->getService(DependentService::class);
+        $this->assertEquals(['key' => 'value'], $depService->getProperties());
     }
 }

@@ -2,6 +2,7 @@
 namespace DinoTech\Phelix\Api\Service\Lifecycle;
 
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
+use DinoTech\Phelix\Api\Config\ConfigBinderInterface;
 use DinoTech\Phelix\Api\Config\FrameworkConfig;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
 use DinoTech\Phelix\Api\Config\ServiceReference;
@@ -41,6 +42,8 @@ class DefaultManager implements ServiceRegistryInterface {
     private $activator;
     /** @var Deactivator */
     private $deactivator;
+    /** @var ConfigBinderInterface */
+    private $configBinder;
 
     public function __construct(Index $services) {
         $this->services = $services;
@@ -56,6 +59,12 @@ class DefaultManager implements ServiceRegistryInterface {
      */
     public function setEventManager(EventManagerInterface $eventManager): DefaultManager {
         $this->eventManager = $eventManager;
+        return $this;
+    }
+
+    public function setConfigBinder(ConfigBinderInterface $configBinder): DefaultManager {
+        $this->configBinder = $configBinder;
+        $this->activator->setConfigBinder($configBinder);
         return $this;
     }
 

@@ -60,4 +60,8 @@ class Env {
         sort($mods);
         return array_intersect($mods, $this->modifiers) == $mods;
     }
+
+    public function append(string $name) : Env {
+        return new Env("{$this->name}.$name");
+    }
 }

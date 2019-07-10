@@ -19,6 +19,7 @@ class ServiceConfig implements \JsonSerializable {
     const KEY_RANK = 'rank';
     const KEY_ID = 'id';
     const KEY_COMPONENT = 'component';
+    const KEY_PROPERTIES = 'properties';
     const KEY_METADATA = 'metadata';
     const KEY_REFERENCES = 'references';
 
@@ -36,6 +37,8 @@ class ServiceConfig implements \JsonSerializable {
     private $component;
     /** @var ServiceReference[] */
     private $references;
+    /** @var ServiceProperties */
+    private $properties;
     /** @var ServiceMetadata */
     private $metadata;
 
@@ -46,6 +49,7 @@ class ServiceConfig implements \JsonSerializable {
         $this->id = ArrayUtils::get($arr, self::KEY_ID, $this->class);
         $this->rank = ArrayUtils::get($arr, self::KEY_RANK, 0);
         $this->component = new ServiceComponent(ArrayUtils::get($arr, self::KEY_COMPONENT, []));
+        $this->properties = new ServiceProperties(ArrayUtils::get($arr, self::KEY_PROPERTIES, []));
         $this->metadata = new ServiceMetadata(ArrayUtils::get($arr, self::KEY_METADATA, []));
         $this->references = array_map(function(array $ref) {
             return new ServiceReference($ref);
@@ -95,6 +99,13 @@ class ServiceConfig implements \JsonSerializable {
     }
 
     /**
+     * @return ServiceProperties
+     */
+    public function getProperties(): ServiceProperties {
+        return $this->properties;
+    }
+
+    /**
      * @return ServiceMetadata
      */
     public function getMetadata(): ServiceMetadata {
@@ -108,7 +119,7 @@ class ServiceConfig implements \JsonSerializable {
             'class' => $this->class,
             'rank' => $this->rank,
             'component' => $this->component,
-            // @todo properties
+            'properties' => $this->properties->jsonSerialize(),
             'metadata' => $this->metadata->jsonSerialize(),
             'references' => array_map(function(ServiceReference $ref) {
                 return $ref->jsonSerialize();

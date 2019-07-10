@@ -4,6 +4,8 @@ namespace DinoTech\Phelix;
 use DinoTech\Phelix\Api\Bundle\BundleRegistry;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectBootable;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectNamedLibs;
+use DinoTech\Phelix\Api\Config\Binders\Filesys;
+use DinoTech\Phelix\Api\Config\ConfigBinderInterface;
 use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
 use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
 use DinoTech\Phelix\Api\Config\Loaders\GenericConfig;
@@ -102,13 +104,17 @@ class Framework implements EventManagerInterface{
     private $serviceRegistry;
     /** @var EventManagerInterface */
     private $eventManager;
+    /** @var ConfigBinderInterface */
+    private $configBinder;
 
     public function __construct(string $env = self::DEFAULT_ENV) {
         $this->env = new Env($env);
         $this->root = getcwd();
-        $this->eventManger = new EventManager();
+        $this->configBinder = new Filesys(Path::join($this->root, 'configs'), $this->env);
+        $this->eventManager = new EventManager();
         $this->serviceRegistry = (new ServiceRegistry())
-            ->setEventManager($this->eventManager);
+            ->setEventManager($this->eventManager)
+            ->setConfigBinder($this->configBinder);
         $this->bundleRegistry = (new BundleRegistry())
             ->setFramework($this)
             ->setServiceRegistry($this->serviceRegistry)
@@ -132,6 +138,7 @@ class Framework implements EventManagerInterface{
     public function setRoot($root) : Framework {
         $this->exceptionIfBooted("cannot set configFile after boot");
         $this->root = $root;
+        $this->configBinder->setRoot($root);
         return $this;
     }
 
@@ -180,6 +187,11 @@ class Framework implements EventManagerInterface{
 
         // @todo make a FrameworkLoader pattern so that we can leverage startup from build/cache/whatever
         $this->loadConfig();
+
+        $configPath = $this->configuration->getFramework()['path.config '];
+        $this->configBinder
+            ->setRoot(Path::join($this->root, $configPath));
+
         $this->loadBundles();
         $this->bundleRegistry->startBundles();
 
@@ -215,12 +227,11 @@ class Framework implements EventManagerInterface{
     }
 
     public function getService($interface) {
-        return $this->serviceRegistry->getByInterface($interface);
+        return $this->serviceRegistry->getService($interface);
     }
 
     public function getServiceByQuery(ServiceQuery $query) {
-        // @todo support string and have ServiceQuery::frompExpression($query)
-        throw new \Exception('not implemented');
+        return $this->serviceRegistry->getServicesByQuery($query)[0];
     }
 
     public function registerEventHandler(EventHandlerInterface $handler, array $topics) {

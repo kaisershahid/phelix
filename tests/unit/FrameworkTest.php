@@ -12,6 +12,7 @@ class FrameworkTest extends Unit {
     protected $framework;
 
     public function _before() {
+        Framework::registerAutoloader();
         $this->framework = (new Framework('test.mod.local'))
             ->setRoot(codecept_data_dir() . '/framework')
             ->setConfigFile('config.yml')
