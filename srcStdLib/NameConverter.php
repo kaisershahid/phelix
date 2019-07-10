@@ -35,4 +35,8 @@ class NameConverter {
     public static function camelToDash($name) {
         return self::camelToLowerCasedSeparated($name, '-');
     }
+
+    public static function classToDot($class) : string {
+        return str_replace('\\', '.', $class);
+    }
 }
