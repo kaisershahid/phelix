@@ -30,6 +30,22 @@ class Path {
         return implode('/', $buff);
     }
 
+    /**
+     * If given path is absolute, return it as-is, otherwise, join with the given
+     * root.
+     *
+     * @param string $path
+     * @param string $root
+     * @return string
+     */
+    public static function joinIfRelative(string $path, string $root) : string {
+        if ($path[0] === '/') {
+            return $path;
+        }
+
+        return self::join($root, $path);
+    }
+
     public static function chompLeftSlash(string $str) : string {
         while ($str[0] == '/') {
             $str = substr($str, 1);

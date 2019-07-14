@@ -6,7 +6,7 @@ use DinoTech\BundleB\DependentService;
 use DinoTech\BundleC\MainServiceC;
 use DinoTech\Phelix\Api\Bundle\BundleManifest;
 use DinoTech\Phelix\Api\Bundle\Loaders\FilesysReader;
-use DinoTech\Phelix\Api\Config\Binders\Filesys;
+use DinoTech\Phelix\Api\Config\Binders\FilesysBinder;
 use DinoTech\Phelix\Api\Service\Lifecycle\DefaultManager;
 use DinoTech\Phelix\Api\Service\LifecycleStatus;
 use DinoTech\Phelix\Api\Service\Registry\Index;
@@ -38,10 +38,8 @@ class DefaultManagerTest extends Unit {
         Framework::registerNamespace('DinoTech\\BundleC', "{$root}/bundle-c/src");
         Framework::registerAutoloader();
 
-        $confRoot = codecept_data_dir('/framework/config');
-        $confBinder = new Filesys($confRoot);
         $this->services = new Index();
-        $this->subject = (new DefaultManager($this->services))->setConfigBinder($confBinder);
+        $this->subject = new DefaultManager($this->services);
         $this->registry = new ServiceRegistry($this->services, $this->subject);
 
         $this->bundleManifestA = (new FilesysReader())->setRoot($root . '/bundle-a')->loadManifest();
@@ -88,6 +86,8 @@ class DefaultManagerTest extends Unit {
     }
 
     public function testConfigBinding() {
+        $confRoot = codecept_data_dir('/framework/config');
+        $this->subject->setConfigBinder(new FilesysBinder($confRoot));
         $depService = $this->subject->getService(DependentService::class);
         $this->assertEquals(['key' => 'value'], $depService->getProperties());
     }

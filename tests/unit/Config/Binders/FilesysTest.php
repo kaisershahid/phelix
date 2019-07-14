@@ -2,14 +2,14 @@
 namespace DinoTech\Phelix\tests\unit\Config\Binders;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\Api\Config\Binders\Filesys;
+use DinoTech\Phelix\Api\Config\Binders\FilesysBinder;
 use DinoTech\Phelix\Env;
 
 class FilesysTest extends Unit {
     const SERVICE_ID = 'Company.Package.ServiceId';
 
     public function testGatherAndSortDirs() {
-        $subject = new Filesys(codecept_data_dir() . 'config-bindings', new Env('test.level2'));
+        $subject = new FilesysBinder(codecept_data_dir() . 'config-bindings', new Env('test.level2'));
         $expected = ['default', 'test', 'test.level2'];
         $this->assertEquals($expected, $subject->getDirs());
     }
@@ -27,12 +27,12 @@ class FilesysTest extends Unit {
      */
     public function testFileResolution(string $envId, string $expectedFile) {
         $env = $envId;
-        $subject = new Filesys(codecept_data_dir() . 'config-bindings', new Env($envId));
+        $subject = new FilesysBinder(codecept_data_dir() . 'config-bindings', new Env($envId));
         $this->assertStringEndsWith($expectedFile, $subject->resolveConfigPath(self::SERVICE_ID));
     }
 
     public function testLoadingConfig() {
-        $subject = new Filesys(codecept_data_dir() . 'config-bindings', new Env('test.level2'));
+        $subject = new FilesysBinder(codecept_data_dir() . 'config-bindings', new Env('test.level2'));
         $expected = ['default', 'test', 'test.level2'];
         $this->assertEquals(['foundAt' => 'test.level2'],
             $subject->getConfigBinding(self::SERVICE_ID)->jsonSerialize());

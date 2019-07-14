@@ -98,7 +98,7 @@ abstract class Enum {
     protected function __postConstruct() {
     }
 
-    public final function name() {
+    public final function name() : string {
         return $this->name;
     }
 
@@ -106,11 +106,11 @@ abstract class Enum {
         return $this->value;
     }
 
-    public final function order() {
+    public final function order() : int {
         return $this->order;
     }
 
-    public final function compareRank(Enum $other) {
+    public final function compareRank(Enum $other) : bool {
         $cls1 = get_class($other);
         $cls2 = static::class;
         if ($cls1 != $cls2) {
@@ -126,19 +126,19 @@ abstract class Enum {
         }
     }
 
-    public final function greaterThan(Enum $other) {
+    public final function greaterThan(Enum $other) : bool {
         return $this->compareRank($other) == 1;
     }
 
-    public final function greaterThanOrEqual(Enum $other) {
+    public final function greaterThanOrEqual(Enum $other) : bool {
         return $this->compareRank($other) >= 0;
     }
 
-    public final function lessThan(Enum $other) {
+    public final function lessThan(Enum $other) : bool {
         return $this->compareRank($other) == -1;
     }
 
-    public final function lessThanOrEqual(Enum $other) {
+    public final function lessThanOrEqual(Enum $other) : bool {
         return $this->compareRank($other) <= 0;
     }
 

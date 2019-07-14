@@ -40,7 +40,7 @@ use DinoTech\StdLib\NameConverter;
  * Note that the first match will be used, not the deepest. The default max depth
  * to check is 2.
  */
-class Filesys implements ConfigBinderInterface {
+class FilesysBinder implements ConfigBinderInterface {
     const DIR_PREFIX = 'bindings';
 
     /** @var string */
@@ -57,7 +57,7 @@ class Filesys implements ConfigBinderInterface {
         $this->setRoot($root);
     }
 
-    public function setRoot(string $root) : Filesys {
+    public function setRoot(string $root) : FilesysBinder {
         $this->root = $root;
         $this->dirs = array_merge(['default'], $this->getSubDirs());
         return $this;
@@ -78,23 +78,7 @@ class Filesys implements ConfigBinderInterface {
             }
         }
 
-        usort($dirs, function(string $a, string $b) {
-            $alen = count(explode('.', $a));
-            $blen = count(explode('.', $b));
-            if ($alen > $blen) {
-                return 1;
-            } else if ($alen < $blen) {
-                return 0;
-            } else {
-                if ($a > $b) {
-                    return 1;
-                } else if ($a < $b) {
-                    return -1;
-                }
-            }
-
-            return 0;
-        });
+        usort($dirs, [self::class, 'sortDirNames']);
 
         return array_filter($dirs, function(string $dir) {
             return $this->env->is($dir);
@@ -160,5 +144,33 @@ class Filesys implements ConfigBinderInterface {
         }
 
         return null;
+    }
+
+    /**
+     * Sorts directory names by applying the following rankings:
+     *
+     * - depth: `a.b` is greater than `a` (infers `a.b.c` is greater than `a.b`, etc.)
+     * - lexical: if two directories have equal depth, lexical sorting is applied
+     *
+     * @param string $a
+     * @param string $b
+     * @return int
+     */
+    public static function sortDirNames(string $a, string $b) {
+        $alen = count(explode('.', $a));
+        $blen = count(explode('.', $b));
+        if ($alen > $blen) {
+            return 1;
+        } else if ($alen < $blen) {
+            return -1;
+        } else {
+            if ($a > $b) {
+                return 1;
+            } else if ($a < $b) {
+                return -1;
+            }
+        }
+
+        return 0;
     }
 }

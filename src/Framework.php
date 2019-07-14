@@ -4,7 +4,7 @@ namespace DinoTech\Phelix;
 use DinoTech\Phelix\Api\Bundle\BundleRegistry;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectBootable;
 use DinoTech\Phelix\Api\Bundle\Loaders\DetectNamedLibs;
-use DinoTech\Phelix\Api\Config\Binders\Filesys;
+use DinoTech\Phelix\Api\Config\Binders\FilesysBinder;
 use DinoTech\Phelix\Api\Config\ConfigBinderInterface;
 use DinoTech\Phelix\Api\Config\Loaders\FileMatcher;
 use DinoTech\Phelix\Api\Config\Loaders\FrameworkConfigLoader;
@@ -110,7 +110,7 @@ class Framework implements EventManagerInterface{
     public function __construct(string $env = self::DEFAULT_ENV) {
         $this->env = new Env($env);
         $this->root = getcwd();
-        $this->configBinder = new Filesys(Path::join($this->root, 'configs'), $this->env);
+        $this->configBinder = new FilesysBinder(Path::join($this->root, 'configs'), $this->env);
         $this->eventManager = new EventManager();
         $this->serviceRegistry = (new ServiceRegistry())
             ->setEventManager($this->eventManager)
@@ -159,8 +159,7 @@ class Framework implements EventManagerInterface{
         return $this;
     }
 
-
-    /**
+     /**
      * @param array $configuration
      * @return Framework
      */
@@ -187,10 +186,9 @@ class Framework implements EventManagerInterface{
 
         // @todo make a FrameworkLoader pattern so that we can leverage startup from build/cache/whatever
         $this->loadConfig();
-
-        $configPath = $this->configuration->getFramework()['path.config '];
+        $configPath = $this->configuration->getFramework()['path.config'];
         $this->configBinder
-            ->setRoot(Path::join($this->root, $configPath));
+            ->setRoot(Path::joinIfRelative($configPath, $this->root));
 
         $this->loadBundles();
         $this->bundleRegistry->startBundles();
