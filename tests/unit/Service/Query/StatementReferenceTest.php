@@ -2,7 +2,7 @@
 namespace DinoTech\Phelix\tests\unit\Service\Query;
 
 use Codeception\Test\Unit;
-use DinoTech\Phelix\Api\Service\Query\StatementReference;
+use DinoTech\Phelix\Api\Service\Query\QueryReference;
 
 class StatementReferenceTest extends Unit {
     public function _getValues() {
@@ -30,7 +30,7 @@ class StatementReferenceTest extends Unit {
      * @dataProvider _getValues
      */
     public function testValueTransformations($original, $expect) {
-        $subject = new StatementReference($original);
-        $this->assertEquals($expect, $subject->getValue());
+        $subject = new QueryReference($original);
+        $this->assertEquals($expect, $subject->getLiteralValue());
     }
 }

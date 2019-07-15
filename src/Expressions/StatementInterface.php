@@ -6,7 +6,7 @@ namespace DinoTech\Phelix\Expressions;
  * @package DinoTech\Phelix\Expressions
  */
 interface StatementInterface {
-    public function setContext($context);
+    public function setContext(ContextInterface $context) : StatementInterface;
 
     public function executeStatement() : StatementInterface;
 

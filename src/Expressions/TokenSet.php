@@ -12,7 +12,7 @@ class TokenSet extends Enum implements TokenSetInterface {
     const STRUCTURE = ['\{|\}', TokenType::ENCLOSING];
     const INDEX     = ['\[|\]|', TokenType::ENCLOSING];
 
-    const LOGICAL_OPERATORS    = ['!=|!|==|&&|\|\||>=|<=|>|<|xor', TokenType::OPERATOR];
+    const LOGICAL_OPERATORS    = ['!=|==|&&|\|\||>=|<=|>|<|xor', TokenType::OPERATOR];
     const MATH_OPERATORS       = ['-|\+|\*|\/', TokenType::OPERATOR];
     const BITWISE_OPERATORS    = ['\^|~|<<|>>|\||&', TokenType::OPERATOR];
     const UNARY_OPERATORS      = ['--|\+\+', TokenType::OPERATOR];

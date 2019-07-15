@@ -3,6 +3,7 @@ namespace DinoTech\Phelix\Api\Service\Query;
 
 use DinoTech\Phelix\Expressions\ExpressionLexer;
 use DinoTech\Phelix\Expressions\ParserInterface;
+use DinoTech\Phelix\Expressions\StatementInterface;
 use DinoTech\Phelix\Expressions\TokenMapper;
 use DinoTech\Phelix\Expressions\TokenSet;
 use DinoTech\Phelix\Expressions\TokenSetInterface;
@@ -20,10 +21,12 @@ class SimpleQueryParser implements ParserInterface {
 
         $this->predBuilder = new StatementBuilder();
         (new ExpressionLexer(self::getTokenMapper()))->lex($query, $this);
-        $this->statement = $this->predBuilder->getRoot()->rebalance();
+        $this->statement = $this->predBuilder->getRoot()
+            ->rebalance()
+            ->build();
     }
 
-    public function getStatement() {
+    public function getStatement() : StatementInterface {
         return $this->statement;
     }
 
