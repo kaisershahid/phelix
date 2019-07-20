@@ -2,8 +2,9 @@
 namespace DinoTech\Phelix\Expressions;
 
 use DinoTech\StdLib\Collections\ArrayUtils;
+use DinoTech\StdLib\Comparator;
 
-class OperatorPrecedence {
+class OperatorPrecedence implements Comparator {
     const MAP_L2R = [
         '!' => 16,
         '~' => 16,
@@ -41,7 +42,7 @@ class OperatorPrecedence {
         return ArrayUtils::get(self::MAP_L2R, $op, 0);
     }
 
-    public static function compareL2R($op1, $op2) {
+    public function compare($op1, $op2) : int {
         $v1 = ArrayUtils::get(self::MAP_L2R, $op1 ?: '', 0);
         $v2 = ArrayUtils::get(self::MAP_L2R, $op2 ?: '', 0);
         if ($v1 > $v2) {
@@ -51,5 +52,10 @@ class OperatorPrecedence {
         } else {
             return 0;
         }
+    }
+
+    /** @deprecated */
+    public static function compareL2R($op1, $op2) : int {
+        return (new self())->compare($op1, $op2);
     }
 }

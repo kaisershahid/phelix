@@ -3,6 +3,8 @@ namespace DinoTech\StdLib;
 
 /**
  * Unifies passing/receiving key-value pairs in a consistent way.
+ * @todo make interface
+ * @todo move to Collections
  */
 class KeyValue {
     private $key;

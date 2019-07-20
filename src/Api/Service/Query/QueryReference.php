@@ -31,16 +31,11 @@ class QueryReference implements \JsonSerializable, ReferenceInterface {
     }
 
     public function __toString() {
-        $l = '';
-        $r = '';
-        $v = $this->buff;
-        if ($this->isStr) {
-            $l = '"';
-            $r = '"';
-            $v = addslashes($v);
+        if ($this->isDynamic()) {
+            return $this->getRawValue();
+        } else {
+            return json_encode($this->getLiteralValue());
         }
-
-        return $l . $v . $r;
     }
 
     public function jsonSerialize() {
@@ -49,6 +44,10 @@ class QueryReference implements \JsonSerializable, ReferenceInterface {
         } else {
             return $this->getLiteralValue();
         }
+    }
+
+    public function getType(): int {
+        return 0;
     }
 
     public function isString() : bool {

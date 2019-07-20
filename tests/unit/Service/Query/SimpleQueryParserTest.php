@@ -10,62 +10,8 @@ use DinoTech\Phelix\Expressions\TokenSet;
 use DinoTech\Phelix\Expressions\TokenSetInterface;
 use DinoTech\Phelix\Expressions\TokenType;
 
-class SimpleQueryParserTest extends Unit implements ParserInterface {
-    /** @var array */
-    private $buff;
-
-    public function _before() {
-        $this->buff = [];
-    }
-
-    public function processChars(string $chars) {
-        $this->buff[] = $chars;
-    }
-
-    public function processToken(string $token, TokenSetInterface $tokenSet) {
-        $this->buff[] = [$token, $tokenSet];
-    }
-
-    public function terminate() {
-    }
-
-    const EXPR_GROUPINGS = '(a=1)';
-
-    /**
-     * @skip
-     */
-    public function testGroupings() {
-        $expect = [
-            ['(', TokenSet::GROUPING()],
-            'a',
-            ['=', TokenSet::LOGICAL_OPERATORS()],
-            '1',
-            [')', TokenSet::GROUPING()],
-        ];
-        (new ExpressionLexer(SimpleQueryParser::getTokenMapper()))->lex(self::EXPR_GROUPINGS, $this);
-        $this->assertEquals($expect, $this->buff);
-    }
-
-    const EXPR_OPERATORS = '!==!||&&abcxor';
-
-    /**
-     * @skip
-     */
-    public function testOperators() {
-        $op = TokenSet::LOGICAL_OPERATORS();
-        $expect = [
-            ['!=', $op],
-            ['=', $op],
-            ['!', $op],
-            ['||', $op],
-            ['&&', $op],
-            'abc',
-            ['xor', $op]
-        ];
-        (new ExpressionLexer(SimpleQueryParser::getTokenMapper()))->lex(self::EXPR_OPERATORS, $this);
-        $this->assertEquals($expect, $this->buff);
-    }
-
+// @todo move to functional
+class SimpleQueryParserTest extends Unit {
     public function _getEvaluationScenarios() {
         return [
             'basic ==' => [
@@ -113,11 +59,15 @@ class SimpleQueryParserTest extends Unit implements ParserInterface {
      * @dataProvider _getEvaluationScenarios
      */
     public function testEvaluation(string $query, array $context, bool $expected) {
+        codecept_debug(">> $query");
         $ctx = new BasicContext($context);
-        $statement = (new SimpleQueryParser($query))
+        $subject = (new SimpleQueryParser($query));
+        $statement = $subject
             ->getStatement()
             ->setContext($ctx);
+
         $result = $statement->executeStatement()->getResults();
         $this->assertEquals($expected, $result);
+        $this->assertEquals($query, (string) $subject->getStatementBuilder()->getRoot());
     }
 }

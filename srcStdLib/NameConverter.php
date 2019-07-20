@@ -5,6 +5,7 @@ use DinoTech\StdLib\Collections\StandardList;
 
 /**
  * Library to map to/from different naming conventions.
+ * @todo move to Strings
  */
 class NameConverter {
     public static function separatorToCamel($name, $separator) {

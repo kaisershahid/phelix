@@ -48,7 +48,7 @@ abstract class AbstractPredicate implements PredicateInterface, \JsonSerializabl
             return $node->isDynamic() ?
                 $context->lookupVar($node->getRawValue()) :
                 $node->getLiteralValue();
-        } else if ($node instanceof  PredicateInterface) {
+        } else if ($node instanceof PredicateInterface) {
             return $node->executePredicate($context);
         }
 

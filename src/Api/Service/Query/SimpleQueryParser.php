@@ -21,13 +21,16 @@ class SimpleQueryParser implements ParserInterface {
 
         $this->predBuilder = new StatementBuilder();
         (new ExpressionLexer(self::getTokenMapper()))->lex($query, $this);
-        $this->statement = $this->predBuilder->getRoot()
-            ->rebalance()
-            ->build();
+    }
+
+    public function getStatementBuilder() : StatementBuilder {
+        return $this->predBuilder;
     }
 
     public function getStatement() : StatementInterface {
-        return $this->statement;
+        $pred = (new NTreePredicateBuilder($this->predBuilder->getRoot()))
+            ->getPredicate();
+        return new Statement($pred);
     }
 
     /**
