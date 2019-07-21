@@ -6,11 +6,12 @@ use DinoTech\LangKit\Predicates\EqualsPredicate;
 use DinoTech\LangKit\Predicates\GreaterThanPredicate;
 use DinoTech\LangKit\Predicates\LeafAPredicate;
 use DinoTech\LangKit\Predicates\LessThanPredicate;
+use DinoTech\LangKit\Predicates\UnaryPredicate;
 use DinoTech\StdLib\Collections\ArrayUtils;
 
 class PredicateFactory {
     const MAP = [
-        'leafa' => LeafAPredicate::class,
+        'unary' => UnaryPredicate::class,
         '==' => EqualsPredicate::class,
         '===' => EqualsPredicate::class,
         '!=' => EqualsPredicate::class,

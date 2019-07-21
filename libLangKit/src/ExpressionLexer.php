@@ -3,6 +3,10 @@ namespace DinoTech\LangKit;
 
 use DinoTech\StdLib\Collections\ArrayUtils;
 
+/**
+ * Basic lexer that splits input along a token set and generates events for a
+ * parser.
+ */
 class ExpressionLexer {
     /** @var TokenMapper */
     private $tokenMapper;

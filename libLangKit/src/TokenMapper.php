@@ -39,6 +39,7 @@ class TokenMapper {
 
     /**
      * @param TokenSetInterface[] $tokenSets
+     * @param string $delim The pattern delimiter.
      * @todo check type
      */
     public function __construct(array $tokenSets, $delim = '#') {

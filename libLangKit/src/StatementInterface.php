@@ -2,8 +2,7 @@
 namespace DinoTech\LangKit;
 
 /**
- * Interface StatementInterface
- * @package DinoTech\LangKit
+ * Executes a compiled statement.
  */
 interface StatementInterface {
     public function setContext(ContextInterface $context) : StatementInterface;

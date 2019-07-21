@@ -2,12 +2,13 @@
 namespace DinoTech\LangKit;
 
 /**
- * Wrapper for basic predicate.
+ * Wrapper for predicate. Simply takes a context and returns a value from
+ * evaluating the underlying predicate.
  */
 interface PredicateInterface {
     /**
      * @param ContextInterface $context
-     * @return mixed|null
+     * @return mixed
      */
     public function executePredicate(ContextInterface $context);
 }

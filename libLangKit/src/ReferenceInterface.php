@@ -2,47 +2,22 @@
 namespace DinoTech\LangKit;
 
 /**
- * A general placeholder for tokens that define a literal value or dynamic
- * reference.
+ * A reference is a lexeme that's either a scalar or reference to a variable,
+ * constant, etc.
  */
 interface ReferenceInterface {
     /**
-     * Reference is a string.
-     * @var int
+     * Returns an int id representing the type.
+     * @return int
      */
-    const TYPE_STRING = 1;
-
-    /**
-     * Reference is a number.
-     * @var int
-     */
-    const TYPE_NUMBER = 2;
-
-    /**
-     * Reference is a keyword.
-     * @var int
-     */
-    const TYPE_KEYWORD = 3;
-
-    /**
-     * Reference defines some kind of structure.
-     * @var int
-     */
-    const TYPE_STRUCTURE = 4;
-
-    /**
-     * Reference is dynamic class/variable.
-     * @var int
-     */
-    const TYPE_DYNAMIC = 5;
-
-    /**
-     * Reference is a function call. (@todo can't this just be lumped with dynamic?)
-     * @var int
-     */
-    const TYPE_FUNCTION = 6;
-
     public function getType() : int;
+
+    /**
+     * Checks if this reference is the given type.
+     * @param int $type
+     * @return bool
+     */
+    public function isType(int $type) : bool;
 
     /**
      * True if reference was originally wrapped quotes or any other string expression.
@@ -67,4 +42,11 @@ interface ReferenceInterface {
      * @return string
      */
     public function getRawValue() : string;
+
+    /**
+     * Returns the literal or evaluated value held by the reference.
+     * @param ContextInterface $context
+     * @return mixed
+     */
+    public function evaluate(ContextInterface $context);
 }

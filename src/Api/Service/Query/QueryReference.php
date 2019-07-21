@@ -1,6 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
+use DinoTech\LangKit\ContextInterface;
 use DinoTech\LangKit\ReferenceInterface;
 
 /**
@@ -50,6 +51,10 @@ class QueryReference implements \JsonSerializable, ReferenceInterface {
         return 0;
     }
 
+    public function isType(int $type) : bool {
+        return false;
+    }
+
     public function isString() : bool {
         return $this->isStr;
     }
@@ -86,4 +91,14 @@ class QueryReference implements \JsonSerializable, ReferenceInterface {
     public function getRawValue(): string {
         return $this->buff;
     }
+
+    public function evaluate(ContextInterface $context) {
+        if ($this->isDynamic()) {
+            return $context->lookupVar($context);
+        }
+
+        return $this->getLiteralValue();
+    }
+
+
 }

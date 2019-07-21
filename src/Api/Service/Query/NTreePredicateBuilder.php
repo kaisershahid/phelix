@@ -3,7 +3,7 @@ namespace DinoTech\Phelix\Api\Service\Query;
 
 use DinoTech\LangKit\PredicateFactory;
 use DinoTech\LangKit\PredicateInterface;
-use DinoTech\LangKit\Predicates\SingleValuePredicate;
+use DinoTech\LangKit\Predicates\UnaryPredicate;
 use DinoTech\LangKit\ReferenceInterface;
 
 class NTreePredicateBuilder {
@@ -63,7 +63,7 @@ class NTreePredicateBuilder {
         $this->shiftOrSetLeft();
 
         if ($this->left() === null) {
-            return (new SingleValuePredicate($this->right()))
+            return (new UnaryPredicate($this->right()))
                 ->setPrefixOp($this->operator());
         }
 
