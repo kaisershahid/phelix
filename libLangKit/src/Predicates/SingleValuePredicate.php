@@ -1,9 +1,9 @@
 <?php
-namespace DinoTech\Phelix\Expressions\Predicates;
+namespace DinoTech\LangKit\Predicates;
 
-use DinoTech\Phelix\Expressions\ContextInterface;
-use DinoTech\Phelix\Expressions\PredicateInterface;
-use DinoTech\Phelix\Expressions\ReferenceInterface;
+use DinoTech\LangKit\ContextInterface;
+use DinoTech\LangKit\PredicateInterface;
+use DinoTech\LangKit\ReferenceInterface;
 use DinoTech\StdLib\Collections\ArrayUtils;
 
 /**

@@ -1,11 +1,11 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
-use DinoTech\Phelix\Expressions\Predicates\AndXOrPredicate;
-use DinoTech\Phelix\Expressions\Predicates\EqualsPredicate;
-use DinoTech\Phelix\Expressions\Predicates\GreaterThanPredicate;
-use DinoTech\Phelix\Expressions\Predicates\LeafAPredicate;
-use DinoTech\Phelix\Expressions\Predicates\LessThanPredicate;
+use DinoTech\LangKit\Predicates\AndXOrPredicate;
+use DinoTech\LangKit\Predicates\EqualsPredicate;
+use DinoTech\LangKit\Predicates\GreaterThanPredicate;
+use DinoTech\LangKit\Predicates\LeafAPredicate;
+use DinoTech\LangKit\Predicates\LessThanPredicate;
 use DinoTech\StdLib\Collections\ArrayUtils;
 
 class PredicateFactory {

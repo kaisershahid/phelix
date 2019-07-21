@@ -1,10 +1,10 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
-use DinoTech\Phelix\Expressions\PredicateFactory;
-use DinoTech\Phelix\Expressions\PredicateInterface;
-use DinoTech\Phelix\Expressions\Predicates\SingleValuePredicate;
-use DinoTech\Phelix\Expressions\ReferenceInterface;
+use DinoTech\LangKit\PredicateFactory;
+use DinoTech\LangKit\PredicateInterface;
+use DinoTech\LangKit\Predicates\SingleValuePredicate;
+use DinoTech\LangKit\ReferenceInterface;
 
 class NTreePredicateBuilder {
     private $root;

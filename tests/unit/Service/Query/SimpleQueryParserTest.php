@@ -4,10 +4,10 @@ namespace DinoTech\Phelix\tests\unit\Service\Query;
 use Codeception\Test\Unit;
 use DinoTech\Phelix\Api\Service\Query\SimpleQueryParser;
 use DinoTech\Phelix\Expressions\BasicContext;
-use DinoTech\Phelix\Expressions\ExpressionLexer;
-use DinoTech\Phelix\Expressions\ParserInterface;
+use DinoTech\LangKit\ExpressionLexer;
+use DinoTech\LangKit\ParserInterface;
 use DinoTech\Phelix\Expressions\TokenSet;
-use DinoTech\Phelix\Expressions\TokenSetInterface;
+use DinoTech\LangKit\TokenSetInterface;
 use DinoTech\Phelix\Expressions\TokenType;
 
 // @todo move to functional

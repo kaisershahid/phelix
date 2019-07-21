@@ -1,9 +1,9 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 /**
  * Interface StatementInterface
- * @package DinoTech\Phelix\Expressions
+ * @package DinoTech\LangKit
  */
 interface StatementInterface {
     public function setContext(ContextInterface $context) : StatementInterface;

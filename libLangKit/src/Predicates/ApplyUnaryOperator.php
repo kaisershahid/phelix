@@ -1,13 +1,13 @@
 <?php
-namespace DinoTech\Phelix\Expressions\Predicates;
+namespace DinoTech\LangKit\Predicates;
 
-use DinoTech\Phelix\Expressions\ContextInterface;
+use DinoTech\LangKit\ContextInterface;
 
 /**
  * @todo support increment/decrement (need Reference to be passed in)
  */
 class ApplyUnaryOperator {
-    const ALLOWED_PREFIX_OPS = ['-' => true, '+' => true];
+    const ALLOWED_PREFIX_OPS = ['!' => true, '-' => true, '+' => true];
     const ALLOWED_POSTFIX_OPS = [];
 
     /** @var string */

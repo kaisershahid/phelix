@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 /**
  * A general placeholder for tokens that define a literal value or dynamic

@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 /**
  * Groups together 1 or more tokens that belong to a general class. For instance,

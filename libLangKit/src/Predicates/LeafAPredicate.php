@@ -1,7 +1,7 @@
 <?php
-namespace DinoTech\Phelix\Expressions\Predicates;
+namespace DinoTech\LangKit\Predicates;
 
-use DinoTech\Phelix\Expressions\ContextInterface;
+use DinoTech\LangKit\ContextInterface;
 
 /**
  * Simply returns Leaf A -- this happens in one of the following:

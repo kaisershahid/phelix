@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 /**
  * Wrapper for basic predicate.

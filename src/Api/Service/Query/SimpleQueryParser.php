@@ -1,12 +1,12 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
-use DinoTech\Phelix\Expressions\ExpressionLexer;
-use DinoTech\Phelix\Expressions\ParserInterface;
-use DinoTech\Phelix\Expressions\StatementInterface;
-use DinoTech\Phelix\Expressions\TokenMapper;
+use DinoTech\LangKit\ExpressionLexer;
+use DinoTech\LangKit\ParserInterface;
+use DinoTech\LangKit\StatementInterface;
+use DinoTech\LangKit\TokenMapper;
+use DinoTech\LangKit\TokenSetInterface;
 use DinoTech\Phelix\Expressions\TokenSet;
-use DinoTech\Phelix\Expressions\TokenSetInterface;
 use DinoTech\Phelix\Expressions\TokenType;
 
 class SimpleQueryParser implements ParserInterface {
@@ -70,7 +70,7 @@ class SimpleQueryParser implements ParserInterface {
     public static function getTokenMapper() {
         // @todo make TokenType enum?
         if (self::$refTokenMapper == null) {
-            self::$refTokenMapper = TokenMapper::fromNames([
+            self::$refTokenMapper = TokenMapper::fromEnumNames(TokenSet::class, [
                 'GROUPING',
                 'LOGICAL_OPERATORS',
                 'MATH_OPERATORS',

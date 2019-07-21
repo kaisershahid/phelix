@@ -4,23 +4,27 @@ namespace DinoTech\Phelix\Api\Service;
 use DinoTech\Phelix\Api\Config\ServiceConfig;
 use DinoTech\Phelix\Api\Config\ServiceReference;
 use DinoTech\Phelix\Api\Service\Query\SimpleQueryParser;
+use DinoTech\Phelix\Api\Service\Query\Statement;
+use DinoTech\Phelix\Expressions\StatementInterface;
 use DinoTech\StdLib\Collections\ArrayUtils;
 
 /**
  * ```
  * service.interface=name && metadata.type=something && component.label=Some Label
  * ```
- * @todo expand capabilities
  */
 class ServiceQuery {
-    /** @var array */
-    private $predicates;
+    /** @var string */
+    private $query;
+    /** @var StatementInterface */
+    private $statement;
     /** @var string */
     private $hash;
 
-    public function __construct(array $predicates) {
-        $this->predicates = $predicates;
-        $this->hash = md5(json_encode($this->predicates));
+    public function __construct(string $query, StatementInterface $statement) {
+        $this->query = $query;
+        $this->statement = $statement;
+        $this->hash = md5(json_encode($this->query));
     }
 
     /**
@@ -31,49 +35,40 @@ class ServiceQuery {
     }
 
     /**
-     * @return array
-     */
-    public function getPredicates(): array {
-        return $this->predicates;
-    }
-
-    /**
      * @param ServiceConfig $serviceConfig
      * @return bool
      */
     public function matchByConfig(ServiceConfig $serviceConfig) {
         $cfg = $serviceConfig->jsonSerialize();
-        foreach ($this->predicates as $property => $constraint) {
-            $val = ArrayUtils::getNested($cfg, $property);
-            if ($constraint == null && $val != null) {
-                continue;
-            }
-
-            // can't do strict compare until we can handle more expressive queries
-            if ($val != $constraint) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->statement
+            ->setContext($cfg)
+            ->executeStatement()
+            ->getResults();
     }
 
     public static function fromReference(ServiceReference $ref) : ServiceQuery {
-        $predicates = [];
+        $query = '';
+        if ($ref->getInterface()) {
+            $query = 'service.interface == "' . json_encode($ref->getInterface()) . '"';
+        }
 
         if ($ref->getQuery()) {
-            $predicates = (new SimpleQueryParser($ref->getQuery()))
-                ->getPredicates();
+            if ($query) {
+                $query .= ' && (' . $ref->getQuery() . ')';
+            } else {
+                $query = $ref->getQuery();
+            }
         }
 
-        if ($ref->getInterface()) {
-            $predicates['interface'] = $ref->getInterface();
+        if (empty(trim($query))) {
+            throw new \RuntimeException("empty query from reference");
         }
 
-        return new static($predicates);
+        return new static($query, (new SimpleQueryParser($query))->getStatement());
     }
 
-    public static function fromInterface($interface) {
-        return new static(['interface' => $interface]);
+    public static function fromInterface(string $interface) : ServiceQuery {
+        $query = 'service.interface == "' . json_encode($interface) . '"';
+        return new static($query, (new SimpleQueryParser($query))->getStatement());
     }
 }

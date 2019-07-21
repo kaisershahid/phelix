@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 /**
  * Represents a very high-level parser that accepts either a pre-defined token or

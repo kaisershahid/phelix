@@ -3,7 +3,6 @@ namespace DinoTech\Phelix\tests\unit\Service\Query;
 
 use Codeception\Test\Unit;
 use DinoTech\Phelix\Api\Service\Query\NTree;
-use DinoTech\Phelix\Api\Service\Query\NTreeNode;
 use DinoTech\Phelix\Expressions\OperatorPrecedence;
 
 class NTreeTest extends Unit {

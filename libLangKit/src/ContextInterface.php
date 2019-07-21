@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 interface ContextInterface {
     public function lookupVar(string $varRef, $default = null);

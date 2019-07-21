@@ -1,7 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
-use DinoTech\Phelix\Expressions\ReferenceInterface;
+use DinoTech\LangKit\ReferenceInterface;
 
 /**
  * Decorates a value/variable in query building.

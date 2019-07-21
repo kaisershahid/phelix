@@ -1,9 +1,9 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
-use DinoTech\Phelix\Expressions\ContextInterface;
-use DinoTech\Phelix\Expressions\PredicateInterface;
-use DinoTech\Phelix\Expressions\StatementInterface;
+use DinoTech\LangKit\ContextInterface;
+use DinoTech\LangKit\PredicateInterface;
+use DinoTech\LangKit\StatementInterface;
 
 class Statement implements StatementInterface {
     /** @var PredicateInterface */

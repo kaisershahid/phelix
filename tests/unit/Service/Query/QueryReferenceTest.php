@@ -4,7 +4,7 @@ namespace DinoTech\Phelix\tests\unit\Service\Query;
 use Codeception\Test\Unit;
 use DinoTech\Phelix\Api\Service\Query\QueryReference;
 
-class StatementReferenceTest extends Unit {
+class QueryReferenceTest extends Unit {
     public function _getValues() {
         return [
             'string' => [
@@ -22,6 +22,14 @@ class StatementReferenceTest extends Unit {
             'float 1.5e10' => [
                 '1.5e10',
                 1.5e10
+            ],
+            'true' => [
+                'true',
+                true,
+            ],
+            'false' => [
+                'false',
+                false
             ]
         ];
     }

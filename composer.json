@@ -11,7 +11,8 @@
     "autoload": {
         "psr-4": {
             "DinoTech\\Phelix\\": "src/",
-            "DinoTech\\StdLib\\": "srcStdLib/"
+            "DinoTech\\StdLib\\": "srcStdLib/",
+            "DinoTech\\LangKit\\": "libLangKit/src/"
         }
     },
 

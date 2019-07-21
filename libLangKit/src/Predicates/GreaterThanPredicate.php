@@ -1,7 +1,7 @@
 <?php
-namespace DinoTech\Phelix\Expressions\Predicates;
+namespace DinoTech\LangKit\Predicates;
 
-use DinoTech\Phelix\Expressions\ContextInterface;
+use DinoTech\LangKit\ContextInterface;
 
 class GreaterThanPredicate extends AbstractPredicate {
     protected function doEval(ContextInterface $context, $left, $right) {

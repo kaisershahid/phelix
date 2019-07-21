@@ -2,9 +2,7 @@
 namespace DinoTech\Phelix\Api\Service\Query;
 
 use DinoTech\Phelix\Expressions\OperatorPrecedence;
-use DinoTech\Phelix\Expressions\PredicateFactory;
-use DinoTech\Phelix\Expressions\PredicateInterface;
-use DinoTech\Phelix\Expressions\Predicates\BranchedPredicate;
+use DinoTech\LangKit\PredicateInterface;
 
 /**
  */

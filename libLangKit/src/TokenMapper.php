@@ -1,5 +1,5 @@
 <?php
-namespace DinoTech\Phelix\Expressions;
+namespace DinoTech\LangKit;
 
 use DinoTech\StdLib\Collections\ArrayUtils;
 
@@ -11,14 +11,16 @@ use DinoTech\StdLib\Collections\ArrayUtils;
 class TokenMapper {
 
     /**
+     * @param string $enumClass
      * @param string[] $names
      * @return TokenMapper
      * @throws \DinoTech\StdLib\Exceptions\EnumException
      */
-    public static function fromNames(array $names) : TokenMapper {
+    public static function fromEnumNames(string $enumClass, array $names) : TokenMapper {
+        $cb = [$enumClass, 'fromName'];
         $enums = [];
         foreach ($names as $name) {
-            $enums[] = TokenSet::fromName($name);
+            $enums[] = $cb($name);
         }
 
         return new self($enums);
@@ -28,7 +30,7 @@ class TokenMapper {
      * @param TokenSetInterface[] $tokenSets
      * @return TokenMapper
      */
-    public static function fromEnums(array $tokenSets) : TokenMapper {
+    public static function fromTokenSets(array $tokenSets) : TokenMapper {
         return new self($tokenSets);
     }
 

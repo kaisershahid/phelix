@@ -1,6 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Expressions;
 
+use DinoTech\LangKit\TokenSetInterface;
 use DinoTech\StdLib\Enum;
 
 /**
