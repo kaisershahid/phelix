@@ -98,6 +98,7 @@ class StatementBuilder implements \JsonSerializable {
 
     public function pushQuote(string $token) : StatementBuilder {
         if ($token == '\\' && $this->str->isComplete()) {
+            codecept_debug($this->getRoot()->jsonSerialize());
             throw new StatementBuilderException("can't escape outside of strings");
         } else if ($this->curRef !== null) {
             throw new StatementBuilderException("can't start string after: {$this->curRef}");

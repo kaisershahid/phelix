@@ -77,7 +77,7 @@ class DefaultManager implements ServiceRegistryInterface {
         return null;
     }
 
-    public function getServiceTracker($interface) : ServiceTracker {
+    public function getServiceTracker($interface) : ?ServiceTracker {
         /** @var ServiceTracker[]|Collection $services */
         $services = $this->getServices($interface);
         if ($services->count() > 0) {

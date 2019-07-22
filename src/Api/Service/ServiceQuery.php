@@ -50,7 +50,7 @@ class ServiceQuery {
     public static function fromReference(ServiceReference $ref) : ServiceQuery {
         $query = '';
         if ($ref->getInterface()) {
-            $query = 'service.interface == ' . json_encode($ref->getInterface());
+            $query = 'interface == ' . json_encode($ref->getInterface());
         }
 
         if ($ref->getQuery()) {
@@ -60,7 +60,7 @@ class ServiceQuery {
                 $query = $ref->getQuery();
             }
         }
-codecept_debug(">> $query");
+
         if (empty(trim($query))) {
             throw new \RuntimeException("empty query from reference");
         }
@@ -69,7 +69,7 @@ codecept_debug(">> $query");
     }
 
     public static function fromInterface(string $interface) : ServiceQuery {
-        $query = 'service.interface == "' . json_encode($interface) . '"';
+        $query = 'interface == ' . json_encode($interface);
         return new static($query, (new SimpleQueryParser($query))->getStatement());
     }
 }
