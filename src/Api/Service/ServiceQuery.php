@@ -5,7 +5,8 @@ use DinoTech\Phelix\Api\Config\ServiceConfig;
 use DinoTech\Phelix\Api\Config\ServiceReference;
 use DinoTech\Phelix\Api\Service\Query\SimpleQueryParser;
 use DinoTech\Phelix\Api\Service\Query\Statement;
-use DinoTech\Phelix\Expressions\StatementInterface;
+use DinoTech\LangKit\StatementInterface;
+use DinoTech\Phelix\Expressions\BasicContext;
 use DinoTech\StdLib\Collections\ArrayUtils;
 
 /**
@@ -41,7 +42,7 @@ class ServiceQuery {
     public function matchByConfig(ServiceConfig $serviceConfig) {
         $cfg = $serviceConfig->jsonSerialize();
         return $this->statement
-            ->setContext($cfg)
+            ->setContext(new BasicContext($cfg))
             ->executeStatement()
             ->getResults();
     }
@@ -49,7 +50,7 @@ class ServiceQuery {
     public static function fromReference(ServiceReference $ref) : ServiceQuery {
         $query = '';
         if ($ref->getInterface()) {
-            $query = 'service.interface == "' . json_encode($ref->getInterface()) . '"';
+            $query = 'service.interface == ' . json_encode($ref->getInterface());
         }
 
         if ($ref->getQuery()) {
@@ -59,7 +60,7 @@ class ServiceQuery {
                 $query = $ref->getQuery();
             }
         }
-
+codecept_debug(">> $query");
         if (empty(trim($query))) {
             throw new \RuntimeException("empty query from reference");
         }

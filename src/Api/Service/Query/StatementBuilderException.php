@@ -1,5 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
-class StatementBuilderException extends \Exception {
+use Behat\Gherkin\Exception\ParserException;
+
+class StatementBuilderException extends ParserException {
 }

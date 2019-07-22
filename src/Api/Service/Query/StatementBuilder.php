@@ -1,6 +1,7 @@
 <?php
 namespace DinoTech\Phelix\Api\Service\Query;
 
+use DinoTech\LangKit\Utils\StringBuilder;
 use DinoTech\Phelix\Expressions\OperatorPrecedence;
 use DinoTech\LangKit\PredicateInterface;
 
@@ -21,10 +22,13 @@ class StatementBuilder implements \JsonSerializable {
     private $tree;
     /** @var NTree */
     private $treePtr;
+    /** @var StringBuilder */
+    private $str;
 
     public function __construct() {
-        $this->tree = (new NTree())->setComparator(new OperatorPrecedence());
+        $this->tree    = (new NTree())->setComparator(new OperatorPrecedence());
         $this->treePtr = $this->tree;
+        $this->str     = new StringBuilder();
     }
 
     protected function dereference() : ?QueryReference {
@@ -55,8 +59,8 @@ class StatementBuilder implements \JsonSerializable {
     protected $groupStack = [];
 
     public function pushGrouping(string $token) : StatementBuilder {
-        if ($this->inQuote) {
-            $this->curRef->append($token);
+        if ($this->str->isStarted()) {
+            $this->str->push($token);
         } else if ($token === '(') {
             if ($this->treePtr->wasLastValue()) {
                 throw new StatementBuilderException("'(' must be start of statement or after an operator");
@@ -78,8 +82,8 @@ class StatementBuilder implements \JsonSerializable {
     }
 
     public function pushOperator(string $token) : StatementBuilder {
-        if ($this->inQuote) {
-            $this->curRef->append($token);
+        if ($this->str->isStarted()) {
+            $this->str->push($token);
         } else {
             $ref = $this->dereference();
             if ($ref !== null) {
@@ -93,37 +97,28 @@ class StatementBuilder implements \JsonSerializable {
     }
 
     public function pushQuote(string $token) : StatementBuilder {
-        if ($this->inEscape) {
-            $this->curRef->append($token);
-            $this->inEscape = false;
-        } else if ($token === '\\') {
-            if (!$this->inQuote) {
-                throw new \Exception("can't escape outside of strings");
+        if ($token == '\\' && $this->str->isComplete()) {
+            throw new StatementBuilderException("can't escape outside of strings");
+        } else if ($this->curRef !== null) {
+            throw new StatementBuilderException("can't start string after: {$this->curRef}");
+        } else if (!$this->str->isStarted()) {
+            $this->str->start($token);
+        } else {
+            $this->str->push($token);
+            if ($this->str->isComplete()) {
+                $this->curRef = (new QueryReference())->setToString()
+                    ->append($this->str->getString());
+                $this->str->reset();
+                $this->treePtr = $this->treePtr->pushValue($this->dereference());
             }
-
-            $this->inEscape = true;
-        } else if (!$this->inQuote) {
-            if ($this->curRef !== null) {
-                throw new StatementBuilderException("can't start quoted string after: {$this->curRef}");
-            }
-
-            $this->inQuote = $token;
-            $this->curRef  = (new QueryReference())->setToString();
-        } else if ($this->inQuote === $token) {
-            $this->inQuote = null;
-            if ($this->treePtr->wasLastValue()) {
-                throw new StatementBuilderException("can't start a string after a reference/value: {$this->lastRef}");
-            }
-
-            $this->treePtr = $this->treePtr->pushValue($this->dereference());
         }
 
         return $this;
     }
 
     public function pushSpace(string $token) : StatementBuilder {
-        if ($this->inQuote) {
-            $this->curRef->append($token);
+        if ($this->str->isStarted()) {
+            $this->str->push($token);
         } else {
             $this->pushReference();
         }
@@ -132,7 +127,9 @@ class StatementBuilder implements \JsonSerializable {
     }
 
     public function pushChars(string $chars) : StatementBuilder {
-        if ($this->curRef === null) {
+        if ($this->str->isStarted()) {
+            $this->str->push($chars);
+        } else if ($this->curRef === null) {
             $this->curRef = new QueryReference($chars);
         } else {
             $this->curRef->append($chars);
@@ -163,7 +160,7 @@ class StatementBuilder implements \JsonSerializable {
             $parent = $ptr->getParent();
         }
 
-        return $this->tree;
+        return $ptr;
     }
 
     public function build() : Statement {
